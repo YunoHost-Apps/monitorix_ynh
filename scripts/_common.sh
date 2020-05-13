@@ -54,7 +54,7 @@ config_monitorix() {
 	ynh_replace_string --match_string __YNH_WWW_PATH__ --replace_string $path_url --target_file $monitorix_conf
 	ynh_replace_string --match_string __MYSQL_USER__ --replace_string $dbuser --target_file $monitorix_conf
 	ynh_replace_string --match_string __MYSQL_PASSWORD__ --replace_string $dbpass --target_file $monitorix_conf
-	ynh_replace_string --match_string __F2B_ADDITIONAL_JAIL__ --replace_string $additional_jail --target_file $monitorix_conf
+	ynh_replace_string --match_string __F2B_ADDITIONAL_JAIL__ --replace_string "$additional_jail" --target_file $monitorix_conf
 }
 
 set_permission() {
