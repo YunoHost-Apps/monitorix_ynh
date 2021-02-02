@@ -1,4 +1,4 @@
-Monitorix For yunohost
+Monitorix for YunoHost
 ======================
 
 [![Integration level](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)  
