@@ -27,6 +27,9 @@ ynh_webpath_available --domain $domain --path_url $path_url || ynh_die --message
 # STANDARD RESTORATION STEPS
 #=================================================
 
+# Creating the folder
+mkdir -p /var/lib/monitorix/www/imgs
+
 # Install package
 ynh_script_progression --message="Reinstalling dependencies..." --weight=5
 install_dependances
