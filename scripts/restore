@@ -29,6 +29,8 @@ ynh_webpath_available --domain $domain --path_url $path_url || ynh_die --message
 
 # Creating the folder
 mkdir -p /var/lib/monitorix/www/imgs
+mkdir -p /etc/monitorix/conf.d/
+touch /etc/monitorix/conf.d/00-debian.conf
 
 # Install package
 ynh_script_progression --message="Reinstalling dependencies..." --weight=5
