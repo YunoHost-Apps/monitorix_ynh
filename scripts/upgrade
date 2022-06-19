@@ -3,36 +3,44 @@
 #=================================================
 # GENERIC START
 #=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Import common cmd
-source ./experimental_helper.sh
-source ./_common.sh
-
-# Source YunoHost helpers
+source _common.sh
 source /usr/share/yunohost/helpers
 
-# Stop script if errors
-ynh_abort_if_errors
-
+#=================================================
+# LOAD SETTINGS
+#=================================================
 ynh_script_progression --message="Loading installation settings..."
 
-# Retrieve app settings
-domain=$(ynh_app_setting_get --app $app --key domain)
-path_url=$(ynh_normalize_url_path --path_url $(ynh_app_setting_get --app $app --key path))
-port=$(ynh_app_setting_get --app $app --key http_port)
-nginx_status_port=$(ynh_app_setting_get --app $app --key nginx_status_port)
-dbuser=$app
-dbname=$app
-dbpass=$(ynh_app_setting_get --app $app --key mysqlpwd)
+app=$YNH_APP_INSTANCE_NAME
 
-# Stop services
-ynh_script_progression --message="Stoping services..."
-systemctl stop monitorix.service
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+port=$(ynh_app_setting_get --app=$app --key=port)
+nginx_status_port=$(ynh_app_setting_get --app=$app --key=nginx_status_port)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+dbuser=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
+
+#=================================================
+# CHECK VERSION
+#=================================================
+ynh_script_progression --message="Checking version..."
+
+upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..."
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-	# restore it if the upgrade fails
+	ynh_clean_check_starting
+	# Restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
@@ -41,43 +49,106 @@ ynh_abort_if_errors
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..."
 
-# Install package
-ynh_script_progression --message="Installing dependencies..." --weight=6
-install_dependances
+ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
 
-# Download package and install it
-ynh_script_progression --message="Upgrading source files..." --weight=6
-get_install_source
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..."
 
-# Update nginx config
-config_nginx
+# If db_name doesn't exist, create it
+if [ -z "$db_name" ]; then
+	db_name=$(ynh_sanitize_dbid --db_name=$app)
+	dbuser=$db_name
+	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+fi
 
-# Update monitorix configuration
-ynh_script_progression --message="Configuring application..."
-config_monitorix
+# If port doesn't exist, create it
+if [ -z "$port" ]; then
+	port=$(ynh_app_setting_get --app=$app --key=http_port)
+	ynh_app_setting_set --app=$app --key=port --value=$port
+	ynh_app_setting_delete --app=app --key=http_port
+fi
 
 # Remove old hook if exist
 ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 
 #=================================================
+# UPGRADE DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Upgrading dependencies..." --weight=6
+
+ynh_install_app_dependencies $pkg_dependencies
+tempdir="$(mktemp -d)"
+ynh_setup_source --dest_dir="$tempdir"
+ynh_package_update
+dpkg --force-confdef --force-confold -i /$tempdir/app.deb
+ynh_package_install -f
+ynh_secure_remove --file="$tempdir"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..."
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+ynh_add_config --template="../conf/nginx_status.conf" --destination="/etc/nginx/conf.d/monitorix_status.conf"
+
+#=================================================
+# UPDATE A CONFIG FILE
+#=================================================
+ynh_script_progression --message="Updating a configuration file..."
+
+jail_list=$(fail2ban-client status | grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')
+additional_jail=""
+for jail in $jail_list; do
+	if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|postfix-sasl|dovecot|nginx-http-auth|sshd|sshd-ddos) ]]; then
+		if [ -z "$additional_jail" ]; then
+			additional_jail="[$jail]"
+		else
+			additional_jail+=", [$jail]"
+		fi
+	fi
+done
+
+path_url_slash_less=${path_url%/}
+ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix/monitorix.conf"
+
+chown www-data:root -R /etc/monitorix
+chmod u=rX,g=rwX,o= -R /etc/monitorix
+chown www-data:root -R /var/lib/monitorix
+chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+
+#=================================================
 # GENERIC FINALIZATION
 #=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
 
-# Set access
-ynh_script_progression --message="Protecting directory..."
-set_permission
-
-# register yunohost service
 yunohost service add monitorix
 
-# Reload monitorix
-# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
-# So this fix that
-ynh_script_progression --message="Starting monitorix services..." --weight=3
-systemctl stop monitorix.service
-sleep 1
-pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=3
+
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
 
 ynh_script_progression --message="Upgrade of $app completed" --last

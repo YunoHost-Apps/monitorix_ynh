@@ -3,82 +3,145 @@
 #=================================================
 # GENERIC START
 #=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Import common cmd
-source ./experimental_helper.sh
-source ./_common.sh
-
-# Source YunoHost helpers
+source _common.sh
 source /usr/share/yunohost/helpers
 
-# Stop script if errors
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
+# Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
-ynh_script_progression --message="Validating installation parameters..."
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
 
-# Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 
-# Check domain/path availability
-test $(ynh_webpath_available --domain $domain --path_url $path_url) == 'True' || ynh_die --message "$domain$path_url is not available, please use an other domain or path."
-ynh_webpath_register $app $domain $path_url
+app=$YNH_APP_INSTANCE_NAME
 
-# Find a port for built-in monitorix HTTP server
-ynh_script_progression --message="Finding available ports..."
-port=$(ynh_find_port --port 8080)
-nginx_status_port=$(ynh_find_port --port $(($port +1)))
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+ynh_script_progression --message="Validating installation parameters..."
 
-# store config in yunohost
+# Register (book) web path
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
 ynh_script_progression --message="Storing installation settings..."
-ynh_app_setting_set --app $app --key http_port --value $port
-ynh_app_setting_set --app $app --key nginx_status_port --value $nginx_status_port
+
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
+# FIND AND OPEN A PORT
+#=================================================
+ynh_script_progression --message="Finding an available port..."
 
-# Install package
+# Find an available port
+port=$(ynh_find_port --port=8080)
+ynh_app_setting_set --app=$app --key=port --value=$port
+nginx_status_port=$(ynh_find_port --port $(($port +1)))
+ynh_app_setting_set --app=$app --key=nginx_status_port --value=$nginx_status_port
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=7
-install_dependances
 
-# Download package and install it
-ynh_script_progression --message="Installing sources files..." --weight=7
-get_install_source
+ynh_install_app_dependencies $pkg_dependencies
+tempdir="$(mktemp -d)"
+ynh_setup_source --dest_dir="$tempdir"
+ynh_package_update
+dpkg --force-confdef --force-confold -i /$tempdir/app.deb
+ynh_package_install -f
+ynh_secure_remove --file="$tempdir"
 
-# # Generate MySQL user
-ynh_script_progression --message="Configuring MySQL database..."
-dbuser=$app
-dbpass=$(ynh_string_random 12)
-ynh_app_setting_set --app $app --key mysqlpwd --value "$dbpass"
-ynh_mysql_create_user $dbuser $dbpass
+#=================================================
+# CREATE A MYSQL DATABASE
+#=================================================
+ynh_script_progression --message="Creating a MySQL database..."
 
-# Config nginx
-ynh_script_progression --message="Configuring nginx..." --weight=1
-config_nginx
+db_name=$(ynh_sanitize_dbid --db_name=$app)
+db_user=$db_name
+ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name
 
-# Update monitorix configuration
-ynh_script_progression --message="Configuring application..." --weight=3
-config_monitorix
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring NGINX web server..." --weight=1
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+ynh_add_config --template="../conf/nginx_status.conf" --destination="/etc/nginx/conf.d/monitorix_status.conf"
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# ADD A CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding a configuration file..." --weight=3
+
+jail_list=$(fail2ban-client status | grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')
+additional_jail=""
+for jail in $jail_list; do
+	if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|postfix-sasl|dovecot|nginx-http-auth|sshd|sshd-ddos) ]]; then
+		if [ -z "$additional_jail" ]; then
+			additional_jail="[$jail]"
+		else
+			additional_jail+=", [$jail]"
+		fi
+	fi
+done
+
+path_url_slash_less=${path_url%/}
+ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix/monitorix.conf"
+
+chown www-data:root -R /etc/monitorix
+chmod u=rX,g=rwX,o= -R /etc/monitorix
+chown www-data:root -R /var/lib/monitorix
+chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
 
-# Set access
-ynh_script_progression --message="Protecting directory..."
-set_permission
-
-# register yunohost service
 yunohost service add monitorix
 
-# Reload monitorix
-ynh_script_progression --message="Starting monitorix services..." --weight=3
-# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
-# So this fix that
-systemctl stop monitorix.service
-sleep 1
-pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=3
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
 
 ynh_script_progression --message="Installation of $app completed" --last
