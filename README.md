@@ -18,7 +18,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Shipped version:** 3.13.1~ynh1
+**Shipped version:** 3.12.0~ynh2
 
 **Demo:** https://www.fibranet.cat/monitorix/
 
