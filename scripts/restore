@@ -3,115 +3,71 @@
 #=================================================
 # GENERIC START
 #=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
 
-# Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
+# Import common cmd
+source ../settings/scripts/experimental_helper.sh
 source ../settings/scripts/_common.sh
+
+# Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
-#=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-ynh_clean_setup () {
-	ynh_clean_check_starting
-}
-# Exit if an error occurs during the execution of the script
+# Stop script if errors
 ynh_abort_if_errors
 
-#=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_script_progression --message="Loading installation settings..."
+ynh_script_progression --message="Loading settings..."
 
-app=$YNH_APP_INSTANCE_NAME
+# Retrieve old app settings
+domain=$(ynh_app_setting_get --app $app --key domain)
+path_url=$(ynh_normalize_url_path --path_url $(ynh_app_setting_get --app $app --key path))
 
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-path_url=$(ynh_app_setting_get --app=$app --key=path)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
+# Check domain/path availability
+ynh_webpath_available --domain $domain --path_url $path_url || ynh_die --message "$domain/$path_url is not available, please use an other domain or path."
 
 #=================================================
 # STANDARD RESTORATION STEPS
 #=================================================
 
-#=================================================
-# SPECIFIC RESTORATION
-#=================================================
-# REINSTALL DEPENDENCIES
-#=================================================
+# Install package
 ynh_script_progression --message="Reinstalling dependencies..." --weight=5
+install_dependances
 
-# Define and install dependencies
-ynh_install_app_dependencies $pkg_dependencies
-tempdir="$(mktemp -d)"
-ynh_setup_source --dest_dir="$tempdir"
-ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
-ynh_package_install -f
-ynh_secure_remove --file="$tempdir"
+# Download package and install it
+ynh_script_progression --message="Installing sources files..." --weight=7
+get_install_source
 
-#=================================================
-# RESTORE THE NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Restoring the NGINX web server configuration..."
+# Create user for database
+ynh_script_progression --message="Configuring MySQL database..."
+dbuser=$app
+dbpass=$(ynh_app_setting_get --app $app --key mysqlpwd)
+ynh_mysql_create_user $dbuser $dbpass
 
-ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
-ynh_restore_file --origin_path="/etc/nginx/conf.d/monitorix_status.conf"
-
-#=================================================
-# RESTORE THE MYSQL DATABASE
-#=================================================
-ynh_script_progression --message="Restoring the MySQL database..."
-
-db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
-ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
-ynh_mysql_connect_as --user=$db_user --password=$db_pwd --database=$db_name < ./db.sql
-
-#=================================================
-# RESTORE VARIOUS FILES
-#=================================================
-ynh_script_progression --message="Restoring various files..." --weight=10
-
+# Restore all config and data
+ynh_script_progression --message="Restoring files..." --weight=10
 ynh_secure_remove --file=/etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
 ynh_secure_remove --file=/var/lib/monitorix
-
-ynh_restore_file --origin_path="/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
-ynh_restore_file --origin_path="/etc/monitorix"
-ynh_restore_file --origin_path="/var/lib/monitorix"
-
-chown www-data:root -R /etc/monitorix
-chmod u=rX,g=rwX,o= -R /etc/monitorix
-chown www-data:root -R /var/lib/monitorix
-chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
-
-#=================================================
-# INTEGRATE SERVICE IN YUNOHOST
-#=================================================
-ynh_script_progression --message="Integrating service in YunoHost..."
-
-yunohost service add monitorix
-
-#=================================================
-# START SYSTEMD SERVICE
-#=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=3
-
-ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+ynh_restore
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
-# RELOAD NGINX
-#=================================================
-ynh_script_progression --message="Reloading NGINX web server..."
 
-ynh_systemd_action --service_name=nginx --action=reload
+# Set access
+ynh_script_progression --message="Protecting directory..."
+set_permission
 
-#=================================================
-# END OF SCRIPT
-#=================================================
+# register yunohost service
+yunohost service add monitorix
+
+# Reload nginx
+systemctl reload nginx.service
+
+# Reload monitorix
+ynh_script_progression --message="Starting monitorix services..." --weight=3
+# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
+# So this fix that
+systemctl stop monitorix.service
+sleep 1
+pkill -f "monitorix-httpd listening on" || true
+ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
 
 ynh_script_progression --message="Restoration completed for $app" --last
