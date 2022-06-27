@@ -6,22 +6,15 @@
         "en": "A monitoring tools",
         "fr": "Un outils de monitoring"
     },
-    "version": "3.12.0~ynh2",
+	"version": "3.12.0~ynh1",
     "url": "http://monitorix.org",
-    "upstream": {
-        "license": "GPL-2.0",
-        "website": "http://monitorix.org",
-        "demo": "https://www.fibranet.cat/monitorix/",
-        "admindoc": "https://www.monitorix.org/documentation.html",
-        "code": "https://github.com/mikaku/Monitorix"
-    },
     "license": "GPL-2.0",
     "maintainer": {
         "name": "Josué Tille",
         "email": "josue@familletille.ch"
     },
     "requirements": {
-        "yunohost": ">= 4.3.0"
+		"yunohost": ">= 4.0.0"
     },
     "multi_instance": false,
     "services": [
@@ -29,14 +22,23 @@
         "mysql"
     ],
     "arguments": {
-        "install": [
+        "install" : [
             {
                 "name": "domain",
-                "type": "domain"
+                "type": "domain",
+                "ask": {
+                    "en": "Choose a domain name for Monitorix",
+                    "fr": "Choisissez un nom de domaine pour Monitorix"
+                },
+                "example": "example.com"
             },
             {
                 "name": "path",
                 "type": "path",
+                "ask": {
+                    "en": "Choose a path for Monitorix",
+                    "fr": "Choisissez un chemin pour Monitorix"
+                },
                 "example": "/monitorix",
                 "default": "/monitorix"
             }
