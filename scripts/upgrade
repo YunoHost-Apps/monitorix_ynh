@@ -85,9 +85,7 @@ ynh_script_progression --message="Upgrading dependencies..." --weight=6
 ynh_install_app_dependencies $pkg_dependencies
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
-ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_package_install -f
+ynh_exec_warn_less dpkg -i $tempdir/monitorix.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================

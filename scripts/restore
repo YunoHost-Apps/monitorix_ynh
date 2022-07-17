@@ -45,12 +45,10 @@ ynh_script_progression --message="Reinstalling dependencies..." --weight=5
 
 # Define and install dependencies
 ynh_install_app_dependencies $pkg_dependencies
+ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
-ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
-ynh_package_install -f
+ynh_exec_warn_less dpkg -i $tempdir/monitorix.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================
