@@ -20,6 +20,7 @@ Monitorix is a free, open source, lightweight system monitoring tool designed to
 
 **Shipped version:** 3.13.1~ynh1
 
+
 **Demo:** https://www.fibranet.cat/monitorix/
 
 ## Screenshots
