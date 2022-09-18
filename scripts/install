@@ -33,6 +33,9 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 ynh_script_progression --message="Validating installation parameters..." --weight=1
 
+final_path=/var/lib/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
+
 # Register (book) web path
 ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 
@@ -43,6 +46,7 @@ ynh_script_progression --message="Storing installation settings..." --weight=1
 
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -66,8 +70,7 @@ ynh_install_app_dependencies $pkg_dependencies
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
 ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_package_install -f
+dpkg -i /$tempdir/app.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================
@@ -113,8 +116,8 @@ ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix
 
 chown www-data:root -R /etc/monitorix
 chmod u=rX,g=rwX,o= -R /etc/monitorix
-chown www-data:root -R /var/lib/monitorix
-chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+chown www-data:root -R "$final_path"
+chmod u=rwX,g=rwX,o= -R "$final_path"
 
 #=================================================
 # GENERIC FINALIZATION
@@ -123,7 +126,7 @@ chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add monitorix
+yunohost service add $app --log="/var/log/$app"
 
 #=================================================
 # START SYSTEMD SERVICE
@@ -131,7 +134,7 @@ yunohost service add monitorix
 ynh_script_progression --message="Starting a systemd service..." --weight=3
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/$app" --line_match=" - Ok, ready."
 
 #=================================================
 # RELOAD NGINX

@@ -29,6 +29,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_user=$db_name
 
@@ -48,9 +49,7 @@ ynh_install_app_dependencies $pkg_dependencies
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
 ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
-ynh_package_install -f
+dpkg -i /$tempdir/app.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================
@@ -76,30 +75,30 @@ ynh_mysql_connect_as --user=$db_user --password=$db_pwd --database=$db_name < ./
 ynh_script_progression --message="Restoring various files..." --weight=10
 
 ynh_secure_remove --file=/etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
-ynh_secure_remove --file=/var/lib/monitorix
+ynh_secure_remove --file="$final_path"
 
 ynh_restore_file --origin_path="/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
 ynh_restore_file --origin_path="/etc/monitorix"
-ynh_restore_file --origin_path="/var/lib/monitorix"
+ynh_restore_file --origin_path="$final_path"
 
 chown www-data:root -R /etc/monitorix
 chmod u=rX,g=rwX,o= -R /etc/monitorix
-chown www-data:root -R /var/lib/monitorix
-chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+chown www-data:root -R "$final_path"
+chmod u=rwX,g=rwX,o= -R "$final_path"
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add monitorix
+yunohost service add $app --log="/var/log/$app"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=3
 
-ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/$app" --line_match=" - Ok, ready."
 
 #=================================================
 # GENERIC FINALIZATION

@@ -18,6 +18,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 port=$(ynh_app_setting_get --app=$app --key=port)
 nginx_status_port=$(ynh_app_setting_get --app=$app --key=nginx_status_port)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
@@ -52,7 +53,7 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app"
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
@@ -73,6 +74,12 @@ if [ -z "$port" ]; then
 	ynh_app_setting_delete --app=$app --key=http_port
 fi
 
+# If final_path doesn't exist, create it
+if [ -z "$final_path" ]; then
+	final_path=/var/lib/$app
+	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
 # Remove old hook if exist
 ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 
@@ -82,11 +89,12 @@ ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 ynh_script_progression --message="Upgrading dependencies..." --weight=6
 
 ynh_install_app_dependencies $pkg_dependencies
+# Workaround for 3.13.1 install `mkdir: cannot create directory '/var/lib/monitorix/www/imgs': No such file or directory`
+ynh_secure_remove --file="$final_path/www/imgs"
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
 ynh_package_update
-dpkg --force-confdef --force-confold -i /$tempdir/app.deb
-ynh_package_install -f
+dpkg -i /$tempdir/app.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================
@@ -122,8 +130,8 @@ ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix
 
 chown www-data:root -R /etc/monitorix
 chmod u=rX,g=rwX,o= -R /etc/monitorix
-chown www-data:root -R /var/lib/monitorix
-chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+chown www-data:root -R "$final_path"
+chmod u=rwX,g=rwX,o= -R "$final_path"
 
 #=================================================
 # GENERIC FINALIZATION
@@ -132,14 +140,14 @@ chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add monitorix
+yunohost service add $app --log="/var/log/$app"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=3
 
-ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/$app" --line_match=" - Ok, ready."
 
 #=================================================
 # RELOAD NGINX

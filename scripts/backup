@@ -27,6 +27,7 @@ ynh_print_info --message="Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 
@@ -34,6 +35,12 @@ db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 # DECLARE DATA AND CONF FILES TO BACKUP
 #=================================================
 ynh_print_info --message="Declaring files to be backed up..."
+
+#=================================================
+# BACKUP THE APP MAIN DIR
+#=================================================
+
+ynh_backup --src_path="$final_path"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
@@ -49,8 +56,6 @@ ynh_backup --src_path="/etc/nginx/conf.d/monitorix_status.conf"
 ynh_backup --src_path="/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
 
 ynh_backup --src_path="/etc/monitorix"
-
-ynh_backup --src_path="/var/lib/monitorix"
 
 #=================================================
 # BACKUP THE MYSQL DATABASE

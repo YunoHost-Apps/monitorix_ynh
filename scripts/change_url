@@ -76,7 +76,7 @@ fi
 #=================================================
 ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app"
 
 #=================================================
 # MODIFY URL IN NGINX CONF
@@ -135,8 +135,8 @@ ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix
 
 chown www-data:root -R /etc/monitorix
 chmod u=rX,g=rwX,o= -R /etc/monitorix
-chown www-data:root -R /var/lib/monitorix
-chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+chown www-data:root -R "$final_path"
+chmod u=rwX,g=rwX,o= -R "$final_path"
 
 #=================================================
 # GENERIC FINALISATION
@@ -146,7 +146,7 @@ chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
 ynh_script_progression --message="Starting a systemd service..." --weight=3
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/monitorix" --line_match=" - Ok, ready."
+ynh_systemd_action --service_name=$app --action="restart" --log_path="/var/log/$app" --line_match=" - Ok, ready."
 
 #=================================================
 # RELOAD NGINX
