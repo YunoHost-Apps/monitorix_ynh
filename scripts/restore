@@ -49,7 +49,7 @@ ynh_install_app_dependencies $pkg_dependencies
 tempdir="$(mktemp -d)"
 ynh_setup_source --dest_dir="$tempdir"
 ynh_package_update
-dpkg -i /$tempdir/app.deb
+dpkg --force-confdef --force-confold -i /$tempdir/app.deb
 ynh_secure_remove --file="$tempdir"
 
 #=================================================
