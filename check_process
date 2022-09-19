@@ -10,8 +10,10 @@
 		setup_private=0
 		setup_public=0
 		upgrade=1
-		# 3.13.1~ynh1
+		# 3.12.0~ynh1
 		upgrade=1	from_commit=c09953008a913b5e1d46be561a10a746eab6d23e
+		# 3.12.0~ynh2
+		upgrade=1	from_commit=244f90cfb0d87168e4ec4e305b3db60bd879017b
 		backup_restore=1
 		multi_instance=0
 		port_already_use=0
