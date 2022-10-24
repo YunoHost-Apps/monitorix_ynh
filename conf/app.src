@@ -1,5 +1,5 @@
-SOURCE_URL=http://www.monitorix.org/monitorix_3.13.1-izzy1_all.deb
-SOURCE_SUM=17a48021c46bf5656caeacbcf2da6bff63816496bf1d4f4926daa64c76a4733f
+SOURCE_URL=http://www.monitorix.org/monitorix_3.14.0-izzy1_all.deb
+SOURCE_SUM=b05e776f425a8b8873c8851b7e1861cefe23e512
 # (Optional) Program to check the integrity (sha256sum, md5sum...)
 # default: sha256
 SOURCE_SUM_PRG=sha256sum

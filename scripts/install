@@ -20,8 +20,6 @@ ynh_script_progression --message="Validating installation parameters..."
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 
-# Check domain/path availability
-test $(ynh_webpath_available --domain $domain --path_url $path_url) == 'True' || ynh_die --message "$domain$path_url is not available, please use an other domain or path."
 ynh_webpath_register $app $domain $path_url
 
 # Find a port for built-in monitorix HTTP server

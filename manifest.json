@@ -14,7 +14,7 @@
         "email": "josue@familletille.ch"
     },
     "requirements": {
-		"yunohost": ">= 3.5.2.2"
+		"yunohost": ">= 4.1.2"
     },
     "multi_instance": false,
     "services": [
@@ -26,19 +26,11 @@
             {
                 "name": "domain",
                 "type": "domain",
-                "ask": {
-                    "en": "Choose a domain name for Monitorix",
-                    "fr": "Choisissez un nom de domaine pour Monitorix"
-                },
                 "example": "example.com"
             },
             {
                 "name": "path",
                 "type": "path",
-                "ask": {
-                    "en": "Choose a path for Monitorix",
-                    "fr": "Choisissez un chemin pour Monitorix"
-                },
                 "example": "/monitorix",
                 "default": "/monitorix"
             }
