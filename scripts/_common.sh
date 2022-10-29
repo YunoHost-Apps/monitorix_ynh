@@ -1,22 +1,21 @@
+#!/bin/bash
+
 #=================================================
-# SET ALL CONSTANTS
+# COMMON VARIABLES
 #=================================================
 
-app=$YNH_APP_INSTANCE_NAME
+# dependencies used by the app
+pkg_dependencies="rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm libxml-libxml-perl"
 
 #=================================================
 # DEFINE ALL COMMON FONCTIONS
 #=================================================
 
-install_dependances() {
-	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm libxml-libxml-perl
-}
-
 get_install_source() {
-	ynh_setup_source --dest_dir /tmp
+	ynh_setup_source --dest_dir /$tempdir
 
 	ynh_package_update
-	dpkg --force-confdef --force-confold -i /tmp/app.deb
+	dpkg --force-confdef --force-confold -i /$tempdir/app.deb
 	ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
 	ynh_package_install -f
 }
@@ -45,16 +44,8 @@ config_monitorix() {
         fi
     done
 
-	monitorix_conf=/etc/monitorix/monitorix.conf
-	cp ../conf/monitorix.conf $monitorix_conf 
-	ynh_replace_string --match_string __SERVICE_PORT__ --replace_string $port --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_DOMAIN__ --replace_string $domain --target_file $monitorix_conf
-	ynh_replace_string --match_string __NGINX_STATUS_PORT__ --replace_string $nginx_status_port --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_WWW_PATH__/ --replace_string "${path_url%/}/" --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_WWW_PATH__ --replace_string $path_url --target_file $monitorix_conf
-	ynh_replace_string --match_string __MYSQL_USER__ --replace_string $dbuser --target_file $monitorix_conf
-	ynh_replace_string --match_string __MYSQL_PASSWORD__ --replace_string $dbpass --target_file $monitorix_conf
-	ynh_replace_string --match_string __F2B_ADDITIONAL_JAIL__ --replace_string "$additional_jail" --target_file $monitorix_conf
+	path_url_slash_less=${path_url%/}
+	ynh_add_config --template="../conf/monitorix.conf" --destination="/etc/monitorix/monitorix.conf"
 }
 
 set_permission() {
