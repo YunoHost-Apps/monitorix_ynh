@@ -16,16 +16,16 @@ From command line:
 
 This application now uses the core-only feature of the backup. To keep the integrity of the data and to have a better guarantee of the restoration it is recommended to proceed as follows:
 
-- Stop Gitea service with this command:
+- Stop Monitorix service with this command:
 
 `systemctl stop monitorix.service`
 
-- Launch Gitea backup with this command:
+- Launch Monitorix backup with this command:
 
 `yunohost backup create --app monitorix`
 
 - Backup your data with your specific strategy (could be with rsync, borg backup or just cp). The data is generally stored in `/var/lib/monitorix`.
-- Restart Gitea service with theses command:
+- Restart Monitorix service with theses command:
 
 `systemctl start monitorix.service`
 
