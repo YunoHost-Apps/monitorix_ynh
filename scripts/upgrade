@@ -48,6 +48,8 @@ install_dependances
 
 # Download package and install it
 ynh_script_progression --message="Upgrading source files..." --weight=6
+# Fix issue on package deployement
+test -e /etc/monitorix/conf.d/00-debian.conf || touch /etc/monitorix/conf.d/00-debian.conf
 get_install_source
 
 # Update nginx config
