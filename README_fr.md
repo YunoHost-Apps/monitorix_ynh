@@ -28,6 +28,41 @@ Monitorix is a free, open source, lightweight system monitoring tool designed to
 
 ## Avertissements / informations importantes
 
+### Upgrade
+
+By default, a backup is performed before upgrading. To avoid this, you have the following options:
+- Pass the `NO_BACKUP_UPGRADE` env variable with `1` at each upgrade. For example `NO_BACKUP_UPGRADE=1 yunohost app upgrade monitorix`.
+- Set `disable_backup_before_upgrade` to `1`. You can set it with this command:
+
+`yunohost app setting monitorix disable_backup_before_upgrade -v 1`
+
+After that, the settings will be applied for **all** the next updates.
+
+From command line:
+
+`yunohost app upgrade monitorix`
+
+### Backup
+
+This application now uses the core-only feature of the backup. To keep the integrity of the data and to have a better guarantee of the restoration it is recommended to proceed as follows:
+
+- Stop Gitea service with this command:
+
+`systemctl stop monitorix.service`
+
+- Launch Gitea backup with this command:
+
+`yunohost backup create --app monitorix`
+
+- Backup your data with your specific strategy (could be with rsync, borg backup or just cp). The data is generally stored in `/var/lib/monitorix`.
+- Restart Gitea service with theses command:
+
+`systemctl start monitorix.service`
+
+### Remove
+
+Due of the backup core only feature the data directory in `/var/lib/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
+
 ### More sensor
 
 If you want to see the temperature of some sensor you can install the `lm-sensor` packet. For disk temperature you can instal the `hddtemp` packet.
@@ -56,8 +91,8 @@ priority = 5
 <lmsens>
         <list>
                 core0   = temp1
-                core1   = 
-                mb0     = 
+                core1   =
+                mb0     =
                 cpu0    =
                 fan0    =
                 fan1    =
@@ -65,13 +100,13 @@ priority = 5
                 volt0   =
                 volt1   =
                 volt2   =
-                volt3   = 
+                volt3   =
                 volt4   =
-                volt5   = 
-                volt6   = 
+                volt5   =
+                volt6   =
                 volt7   =
         </list>
-</lmsns> 
+</lmsns>
 
 # GENSENS graph
 # -----------------------------------------------------------------------------
@@ -130,7 +165,7 @@ priority = 5
         <list>
                 0 = /, /home, /var, /$tempdir, swap
         </list>
-        <desc> 
+        <desc>
                 / = Root FS
                 /home = home
                 /var = var
