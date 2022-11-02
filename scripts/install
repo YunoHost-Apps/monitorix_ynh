@@ -22,6 +22,12 @@ path_url=$YNH_APP_ARG_PATH
 
 ynh_webpath_register $app $domain $path_url
 
+if [ -e "/var/lib/monitorix" ]; then
+    old_data_dir_path="/var/lib/monitorix$(date '+%Y%m%d.%H%M%S')"
+    ynh_print_warn "A data directory already exist. Data was renamed to $old_data_dir_path"
+    mv "/var/lib/monitorix" "$old_data_dir_path"
+fi
+
 # Find a port for built-in monitorix HTTP server
 ynh_script_progression --message="Finding available ports..."
 port=$(ynh_find_port --port 8080)

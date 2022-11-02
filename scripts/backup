@@ -18,6 +18,10 @@ ynh_abort_if_errors
 ynh_print_info --message="Loading installation settings..."
 domain=$(ynh_app_setting_get --app $app --key domain)
 
+if [[ ! "$(systemctl status $app.service)" =~ "Active: inactive (dead)" ]]; then
+    ynh_print_warn --message="It's hightly recommended to make your backup when the service is stopped. Please stop $app service and with this command before to run the backup 'systemctl stop $app.service'"
+fi
+
 #=================================================
 # STANDARD BACKUP STEPS
 #=================================================
@@ -36,6 +40,6 @@ ynh_backup --src_path "/etc/monitorix"
 
 # Copy Monitorix data
 ynh_print_info --message="Backing up data..."
-ynh_backup --src_path "/var/lib/monitorix"
+ynh_backup --src_path "/var/lib/monitorix" --is_big=1
 
 ynh_print_info --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."

@@ -30,11 +30,14 @@ ynh_script_progression --message="Stoping services..."
 systemctl stop monitorix.service
 
 # Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
+if [ "0$(ynh_app_setting_get --app=$app --key=disable_backup_before_upgrade)" -ne 1 ]
+then
+    ynh_backup_before_upgrade
+    ynh_clean_setup () {
+        # Clean installation remainings that are not handled by the remove script.
+        ynh_restore_upgradebackup
+    }
+fi
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
