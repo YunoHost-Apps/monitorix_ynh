@@ -9,7 +9,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 
 install_dependances() {
-	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm libxml-libxml-perl
+	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libdbd-mysql-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm libxml-libxml-perl
 }
 
 get_install_source() {
