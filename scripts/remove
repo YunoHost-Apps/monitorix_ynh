@@ -39,6 +39,10 @@ ynh_print_info --message="Due of the backup core only feature the data directory
 ynh_secure_remove --file="/etc/nginx/conf.d/monitorix_status.conf"
 ynh_remove_nginx_config
 
+# Remove init script
+ynh_script_progression --message="Removing systemd units..."
+ynh_remove_systemd_config
+
 # Autoremove package
 ynh_script_progression --message="Removing dependencies" --weight=10
 ynh_remove_app_dependencies
