@@ -3,6 +3,7 @@ Description=Monitorix
 
 [Service]
 Type=simple
+User=__SYSTEMD_USER__
 ExecStart=/usr/bin/monitorix -c /etc/monitorix/monitorix.conf -p  /var/run/monitorix.pid -n
 Restart=always
 
