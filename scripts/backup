@@ -32,6 +32,9 @@ domain=$(ynh_app_setting_get --app $app --key domain)
 ynh_backup --src_path "/etc/nginx/conf.d/${domain}.d/${app}.conf"
 ynh_backup --src_path "/etc/nginx/conf.d/monitorix_status.conf"
 
+# systemd config
+ynh_backup --src_path "/etc/systemd/system/${app}.service"
+
 # Copy hook
 ynh_backup --src_path "/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
 

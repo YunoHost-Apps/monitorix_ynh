@@ -49,6 +49,10 @@ ynh_secure_remove --file=/etc/monitorix # we remove the directory because if it 
 ynh_secure_remove --file=/var/lib/monitorix
 ynh_restore
 
+# Restore systemd files
+systemctl daemon-reload
+systemctl enable "$app".service --quiet
+
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
@@ -70,6 +74,6 @@ ynh_script_progression --message="Starting monitorix services..." --weight=3
 systemctl stop monitorix.service
 sleep 1
 pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+ynh_systemd_action -l ' - Ok, ready.' -p 'systemd'
 
 ynh_script_progression --message="Restoration completed for $app" --last

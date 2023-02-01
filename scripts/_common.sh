@@ -3,6 +3,7 @@
 #=================================================
 
 app=$YNH_APP_INSTANCE_NAME
+systemd_user=root
 
 #=================================================
 # DEFINE ALL COMMON FONCTIONS
@@ -46,7 +47,7 @@ config_monitorix() {
     done
 
 	monitorix_conf=/etc/monitorix/monitorix.conf
-	cp ../conf/monitorix.conf $monitorix_conf 
+	cp ../conf/monitorix.conf $monitorix_conf
 	ynh_replace_string --match_string __SERVICE_PORT__ --replace_string $port --target_file $monitorix_conf
 	ynh_replace_string --match_string __YNH_DOMAIN__ --replace_string $domain --target_file $monitorix_conf
 	ynh_replace_string --match_string __NGINX_STATUS_PORT__ --replace_string $nginx_status_port --target_file $monitorix_conf
