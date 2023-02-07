@@ -55,6 +55,10 @@ install_dependances
 ynh_script_progression --message="Installing sources files..." --weight=7
 get_install_source
 
+# Configure init script
+ynh_script_progression --message="Configuring a systemd service..." --weight=2
+ynh_add_systemd_config
+
 # # Generate MySQL user
 ynh_script_progression --message="Configuring MySQL database..."
 dbuser=$app
@@ -88,6 +92,6 @@ ynh_script_progression --message="Starting monitorix services..." --weight=3
 systemctl stop monitorix.service
 sleep 1
 pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+ynh_systemd_action -l ' - Ok, ready.' -p 'systemd'
 
 ynh_script_progression --message="Installation of $app completed" --last

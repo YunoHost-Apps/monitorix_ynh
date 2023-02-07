@@ -55,6 +55,10 @@ ynh_script_progression --message="Upgrading source files..." --weight=6
 test -e /etc/monitorix/conf.d/00-debian.conf || touch /etc/monitorix/conf.d/00-debian.conf
 get_install_source
 
+# Configure init script
+ynh_script_progression --message="Configuring a systemd service..." --weight=2
+ynh_add_systemd_config
+
 # Update nginx config
 config_nginx
 
@@ -83,6 +87,6 @@ ynh_script_progression --message="Starting monitorix services..." --weight=3
 systemctl stop monitorix.service
 sleep 1
 pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+ynh_systemd_action -l ' - Ok, ready.' -p 'systemd'
 
 ynh_script_progression --message="Upgrade of $app completed" --last
