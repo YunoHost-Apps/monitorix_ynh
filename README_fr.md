@@ -6,6 +6,7 @@ It shall NOT be edited by hand.
 # Monitorix pour YunoHost
 
 [![Niveau d’intégration](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+
 [![Installer Monitorix avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
 *[Read this readme in english.](./README.md)*
@@ -18,7 +19,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Version incluse :** 3.15.0~ynh2
+**Version incluse :** 3.15.0~ynh3
 
 **Démo :** https://www.fibranet.cat/monitorix/
 
