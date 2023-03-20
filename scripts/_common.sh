@@ -17,7 +17,7 @@ get_install_source() {
 	ynh_setup_source --dest_dir /tmp
 
 	ynh_package_update
-	dpkg --force-confdef --force-confold -i /tmp/app.deb
+	dpkg --force-confdef --force-confold -i /tmp/monitorix.deb
 	ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
 	ynh_package_install -f
 }
