@@ -17,7 +17,7 @@ get_install_source() {
 	ynh_setup_source --dest_dir /tmp
 
 	ynh_package_update
-	dpkg --force-confdef --force-confold -i /tmp/app.deb
+	dpkg --force-confdef --force-confold -i /tmp/monitorix.deb
 	ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
 	ynh_package_install -f
 }
@@ -37,7 +37,7 @@ config_monitorix() {
     jail_list=$(fail2ban-client status | grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')
     additional_jail=""
     for jail in $jail_list; do
-        if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|postfix-sasl|dovecot|nginx-http-auth|sshd|sshd-ddos) ]]; then
+        if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|sasl|dovecot|nginx-http-auth|sshd) ]]; then
             if [ -z "$additional_jail" ]; then
                 additional_jail="[$jail]"
             else
