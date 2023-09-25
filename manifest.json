@@ -3,8 +3,8 @@
     "id": "monitorix",
     "packaging_format": 1,
     "description": {
-        "en": "A monitoring tools",
-        "fr": "Un outils de monitoring"
+        "en": "A system monitoring tool",
+        "fr": "Un outil de monitoring système"
     },
     "version": "3.15.0~ynh3",
     "url": "http://monitorix.org",
