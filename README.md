@@ -284,7 +284,7 @@ In this config we have :
 * Official app website: <http://monitorix.org>
 * Official admin documentation: <https://www.monitorix.org/documentation.html>
 * Upstream app code repository: <https://github.com/mikaku/Monitorix>
-* YunoHost documentation for this app: <https://yunohost.org/app_monitorix>
+* YunoHost Store: <https://apps.yunohost.org/app/monitorix>
 * Report a bug: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
 
 ## Developer info
