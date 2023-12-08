@@ -3,90 +3,87 @@
 #=================================================
 # GENERIC START
 #=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Import common cmd
-source ./experimental_helper.sh
-source ./_common.sh
-
-# Source YunoHost helpers
+source _common.sh
 source /usr/share/yunohost/helpers
 
-# Stop script if errors
-ynh_abort_if_errors
-
-ynh_script_progression --message="Loading installation settings..."
-
-# Retrieve app settings
-domain=$(ynh_app_setting_get --app $app --key domain)
-path_url=$(ynh_normalize_url_path --path_url $(ynh_app_setting_get --app $app --key path))
-port=$(ynh_app_setting_get --app $app --key http_port)
-nginx_status_port=$(ynh_app_setting_get --app $app --key nginx_status_port)
-dbuser=$app
-dbname=$app
-dbpass=$(ynh_app_setting_get --app $app --key mysqlpwd)
-
-# Stop services
-ynh_script_progression --message="Stoping services..."
-systemctl stop monitorix.service
-
-# Backup the current version of the app
-if [ "0$(ynh_app_setting_get --app=$app --key=disable_backup_before_upgrade)" -ne 1 ]
-then
-    ynh_backup_before_upgrade
-    ynh_clean_setup () {
-        # Clean installation remainings that are not handled by the remove script.
-        ynh_restore_upgradebackup
-    }
-fi
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+upgrade_type=$(ynh_check_app_version_changed)
 
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-# Install package
-ynh_script_progression --message="Installing dependencies..." --weight=6
-install_dependances
-
-# Download package and install it
-ynh_script_progression --message="Upgrading source files..." --weight=6
 # Fix issue on package deployement
 test -e /etc/monitorix/conf.d/00-debian.conf || touch /etc/monitorix/conf.d/00-debian.conf
-get_install_source
-
-# Configure init script
-ynh_script_progression --message="Configuring a systemd service..." --weight=2
-ynh_add_systemd_config
-
-# Update nginx config
-config_nginx
-
-# Update monitorix configuration
-ynh_script_progression --message="Configuring application..."
-config_monitorix
 
 # Remove old hook if exist
 ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 
 #=================================================
-# GENERIC FINALIZATION
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..." --weight=1
+
+ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+
+#=================================================
+# "REBUILD" THE APP (DEPLOY NEW SOURCES, RERUN NPM BUILD...)
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# Set access
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..." --weight=1
+
+	# Download, check integrity, uncompress and patch the source from manifest.toml
+	install_monitorix_package
+fi
+
+ynh_systemd_action --service_name="$app" --action="stop" --log_path="systemd" --timeout=15
+
+#=================================================
+# REAPPLY SYSTEM CONFIGURATIONS
+#=================================================
+ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+
+ynh_add_config --template "nginx_status.conf" --destination "$nginx_status_conf"
+ynh_add_nginx_config
+
+ynh_add_systemd_config
+
+yunohost service add $app --description="Monitorix" --log="systemd"
+
+#=================================================
+# RECONFIGURE THE APP (UPDATE CONF, APPLY MIGRATIONS...)
+#=================================================
+# UPDATE A CONFIG FILE
+#=================================================
+ynh_script_progression --message="Updating a configuration file..." --weight=1
+
+config_monitorix
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
 ynh_script_progression --message="Protecting directory..."
+
 set_permission
 
-# register yunohost service
-yunohost service add monitorix
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=1
 
-# Reload monitorix
-# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
-# So this fix that
-ynh_script_progression --message="Starting monitorix services..." --weight=3
-systemctl stop monitorix.service
-sleep 1
-pkill -f "monitorix-httpd listening on" || true
-ynh_systemd_action -l ' - Ok, ready.' -p 'systemd'
+_ynh_systemd_restart_monitorix
+
+#=================================================
+# END OF SCRIPT
+#=================================================
 
 ynh_script_progression --message="Upgrade of $app completed" --last
