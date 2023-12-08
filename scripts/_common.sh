@@ -2,60 +2,48 @@
 # SET ALL CONSTANTS
 #=================================================
 
-app=$YNH_APP_INSTANCE_NAME
+pkg_version="3.15.0"
 systemd_user=root
+
+nginx_status_conf="/etc/nginx/conf.d/monitorix_status.conf"
 
 #=================================================
 # DEFINE ALL COMMON FONCTIONS
 #=================================================
 
-install_dependances() {
-	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libdbd-mysql-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm libxml-libxml-perl mariadb-server
-}
+install_monitorix_package() {
+    # Create the temporary directory
+    tempdir="$(mktemp -d)"
 
-get_install_source() {
-	ynh_setup_source --dest_dir /tmp
+    # Download the deb files
+    ynh_setup_source --dest_dir="$tempdir" --source_id="main"
 
-	ynh_package_update
-	dpkg --force-confdef --force-confold -i /tmp/monitorix.deb
-	ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
-	ynh_package_install -f
-}
+    # Install the package
+    ynh_package_install "$tempdir/monitorix.deb"
 
-config_nginx() {
-    ynh_add_nginx_config
+    # The doc says it should be called only once,
+    # but the code says multiple calls are supported.
+    # Also, they're already installed so that should be quasi instantaneous.
+    ynh_install_app_dependencies monitorix="$pkg_version"
 
-    # Add special hostname for monitorix status
-	nginx_status_conf="/etc/nginx/conf.d/monitorix_status.conf"
-	cp ../conf/nginx_status.conf $nginx_status_conf
-	ynh_replace_string --match_string __PORT__ --replace_string $nginx_status_port --target_file $nginx_status_conf
-
-    systemctl reload nginx
+    # Mark packages as dependencies, to allow automatic removal
+    apt-mark auto monitorix
 }
 
 config_monitorix() {
     jail_list=$(fail2ban-client status | grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')
-    additional_jail=""
+    f2b_additional_jail=""
     for jail in $jail_list; do
         if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|postfix-sasl|dovecot|nginx-http-auth|sshd|sshd-ddos) ]]; then
-            if [ -z "$additional_jail" ]; then
-                additional_jail="[$jail]"
+            if [ -z "$f2b_additional_jail" ]; then
+                f2b_additional_jail="[$jail]"
             else
-                additional_jail+=", [$jail]"
+                f2b_additional_jail+=", [$jail]"
             fi
         fi
     done
 
-	monitorix_conf=/etc/monitorix/monitorix.conf
-	cp ../conf/monitorix.conf $monitorix_conf
-	ynh_replace_string --match_string __SERVICE_PORT__ --replace_string $port --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_DOMAIN__ --replace_string $domain --target_file $monitorix_conf
-	ynh_replace_string --match_string __NGINX_STATUS_PORT__ --replace_string $nginx_status_port --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_WWW_PATH__/ --replace_string "${path_url%/}/" --target_file $monitorix_conf
-	ynh_replace_string --match_string __YNH_WWW_PATH__ --replace_string $path_url --target_file $monitorix_conf
-	ynh_replace_string --match_string __MYSQL_USER__ --replace_string $dbuser --target_file $monitorix_conf
-	ynh_replace_string --match_string __MYSQL_PASSWORD__ --replace_string $dbpass --target_file $monitorix_conf
-	ynh_replace_string --match_string __F2B_ADDITIONAL_JAIL__ --replace_string "$additional_jail" --target_file $monitorix_conf
+    ynh_add_config --template=../conf/monitorix.conf --destination="/etc/monitorix/monitorix.conf"
 }
 
 set_permission() {
@@ -63,4 +51,15 @@ set_permission() {
     chmod u=rX,g=rwX,o= -R /etc/monitorix
     chown www-data:root -R /var/lib/monitorix
     chmod u=rwX,g=rwX,o= -R /var/lib/monitorix
+}
+
+_ynh_systemd_restart_monitorix() {
+    # Reload monitorix
+    # While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
+    # So this fix that
+
+    ynh_systemd_action --service_name=$app --action="stop" --log_path="systemd"
+    sleep 1
+    pkill -f "monitorix-httpd listening on" || true
+    ynh_systemd_action --service_name="$app" --action="start" --log_path 'systemd' --line_match ' - Ok, ready.'
 }

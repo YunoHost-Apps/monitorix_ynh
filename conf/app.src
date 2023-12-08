@@ -1,5 +1,0 @@
-SOURCE_URL=https://www.monitorix.org/monitorix_3.15.0-izzy1_all.deb
-SOURCE_SUM=0d960b9433ecbaba38d9befe27163644886fb5a466d44f5380576ca975b9d8e4
-SOURCE_FORMAT=deb
-SOURCE_EXTRACT=false
-SOURCE_FILENAME=monitorix.deb

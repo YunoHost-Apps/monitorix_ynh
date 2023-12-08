@@ -3,46 +3,57 @@
 #=================================================
 # GENERIC START
 #=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Import common cmd
-source ../settings/scripts/experimental_helper.sh
+# Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
-
-# Source YunoHost helpers
 source /usr/share/yunohost/helpers
-
-# Stop script if errors
-ynh_abort_if_errors
-
-# Retrieve arguments
-ynh_print_info --message="Loading installation settings..."
-domain=$(ynh_app_setting_get --app $app --key domain)
 
 if [[ ! "$(systemctl status $app.service)" =~ "Active: inactive (dead)" ]]; then
     ynh_print_warn --message="It's hightly recommended to make your backup when the service is stopped. Please stop $app service and with this command before to run the backup 'systemctl stop $app.service'"
 fi
 
 #=================================================
-# STANDARD BACKUP STEPS
+# DECLARE DATA AND CONF FILES TO BACKUP
+#=================================================
+ynh_print_info --message="Declaring files to be backed up..."
+
+#=================================================
+# BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-# Copy NGINX configuration
-ynh_print_info --message="Backing up configuration..."
-domain=$(ynh_app_setting_get --app $app --key domain)
-ynh_backup --src_path "/etc/nginx/conf.d/${domain}.d/${app}.conf"
+ynh_backup --src_path "/etc/nginx/conf.d/$domain.d/$app.conf"
 ynh_backup --src_path "/etc/nginx/conf.d/monitorix_status.conf"
 
-# systemd config
-ynh_backup --src_path "/etc/systemd/system/${app}.service"
+#=================================================
+# SPECIFIC BACKUP
+#=================================================
+# BACKUP SYSTEMD
+#=================================================
 
-# Copy hook
-ynh_backup --src_path "/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
+ynh_backup --src_path "/etc/systemd/system/$app.service"
 
-# Copy Monitorix configuration
-ynh_backup --src_path "/etc/monitorix"
+#=================================================
+# BACKUP VARIOUS FILES
+#=================================================
 
-# Copy Monitorix data
-ynh_print_info --message="Backing up data..."
-ynh_backup --src_path "/var/lib/monitorix" --is_big=1
+ynh_backup --src_path "/var/lib/$app" --is_big=1
+
+ynh_backup --src_path="/etc/$app/"
+
+#=================================================
+# BACKUP THE MYSQL DATABASE
+#=================================================
+ynh_print_info --message="Backing up the MySQL database..."
+
+### (However, things like MySQL dumps *do* take some time to run, though the
+### copy of the generated dump to the archive still happens later)
+
+ynh_mysql_dump_db --database="$db_name" > db.sql
+
+#=================================================
+# END OF SCRIPT
+#=================================================
 
 ynh_print_info --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."

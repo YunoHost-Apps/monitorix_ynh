@@ -1,0 +1,64 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "monitorix"
+name = "Monitorix"
+description.en = "A system monitoring tool"
+description.fr = "Un outil de monitoring système"
+
+version = "3.15.0~ynh3"
+
+maintainers = ["Josue-T"]
+
+[upstream]
+license = "GPL-2.0"
+website = "https://monitorix.org"
+demo = "https://www.fibranet.cat/monitorix/"
+admindoc = "https://www.monitorix.org/documentation.html"
+code = "https://github.com/mikaku/Monitorix"
+cpe = "cpe:2.3:a:fibranet:monitorix"
+
+[integration]
+yunohost = ">= 11.0.11"
+architectures = "all"
+multi_instance = false
+ldap = "not_relevant"
+sso = "not_relevant"
+disk = "50M"
+ram.build = "50M"
+ram.runtime = "50M"
+
+[install]
+    [install.domain]
+    # this is a generic question - ask strings are automatically handled by Yunohost's core
+    type = "domain"
+
+    [install.path]
+    # this is a generic question - ask strings are automatically handled by Yunohost's core
+    type = "path"
+    default = "/monitorix"
+
+[resources]
+    [resources.sources.main]
+    url = "https://www.monitorix.org/monitorix_3.15.0-izzy1_all.deb"
+    sha256 = "0d960b9433ecbaba38d9befe27163644886fb5a466d44f5380576ca975b9d8e4"
+    format = "whatever"
+    rename = "monitorix.deb"
+
+    [resources.system_user]
+
+    [resources.permissions]
+    main.url = "/"
+
+    [resources.ports]
+    main.default = 8080
+    nginx_status.default = 8081
+
+    [resources.apt]
+    packages = [
+        "mariadb-server",
+    ]
+
+    [resources.database]
+    type = "mysql"
