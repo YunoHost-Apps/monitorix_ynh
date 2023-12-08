@@ -281,7 +281,7 @@ In this config we have :
 
 ## Documentation and resources
 
-* Official app website: <http://monitorix.org>
+* Official app website: <https://monitorix.org>
 * Official admin documentation: <https://www.monitorix.org/documentation.html>
 * Upstream app code repository: <https://github.com/mikaku/Monitorix>
 * YunoHost Store: <https://apps.yunohost.org/app/monitorix>
