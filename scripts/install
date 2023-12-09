@@ -24,10 +24,6 @@ fi
 #=================================================
 ynh_script_progression --message="Installing packages..." --weight=1
 
-mkdir -p /var/lib/monitorix/www/imgs
-mkdir -p /etc/monitorix/conf.d/
-touch /etc/monitorix/conf.d/00-debian.conf
-
 # Download package and install it
 install_monitorix_package
 
