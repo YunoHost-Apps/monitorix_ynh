@@ -39,7 +39,7 @@ ynh_systemd_action --service_name="$app" --action="stop" --log_path="systemd" --
 ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
 
 ynh_add_systemd_config
-yunohost service add "$app" --description="Monitorix"
+yunohost service add "$app" --description="Monitorix" --log=systemd
 
 ynh_add_config --template "nginx_status.conf" --destination "$nginx_status_conf"
 ynh_add_nginx_config
