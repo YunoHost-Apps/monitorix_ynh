@@ -1,0 +1,10 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/tests.v1.schema.json
+
+test_format = 1.0
+
+[default]
+
+    exclude = []
+
+    [default.test_upgrade_from.c09953008a913b5e1d46be561a10a746eab6d23e]
+    name = "v3.12"
