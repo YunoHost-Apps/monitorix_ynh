@@ -2,7 +2,7 @@
 # SET ALL CONSTANTS
 #=================================================
 
-pkg_version="3.15.0"
+pkg_version="3.15.0-izzy1"
 systemd_user=root
 
 nginx_status_conf="/etc/nginx/conf.d/monitorix_status.conf"
