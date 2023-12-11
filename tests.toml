@@ -6,5 +6,5 @@ test_format = 1.0
 
     exclude = []
 
-    [default.test_upgrade_from.c09953008a913b5e1d46be561a10a746eab6d23e]
-    name = "v3.12"
+    [default.test_upgrade_from.6ea6f67f5d3b7a3303a5ff2f4640e6e01cb6bdae]
+    name = "v3.15.0~ynh3 (manifestv1)"
