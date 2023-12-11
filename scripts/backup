@@ -10,9 +10,12 @@
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
-if [[ ! "$(systemctl status $app.service)" =~ "Active: inactive (dead)" ]]; then
-    ynh_print_warn --message="It's hightly recommended to make your backup when the service is stopped. Please stop $app service and with this command before to run the backup 'systemctl stop $app.service'"
-fi
+#=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..." --weight=1
+
+ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
@@ -51,6 +54,13 @@ ynh_print_info --message="Backing up the MySQL database..."
 ### copy of the generated dump to the archive still happens later)
 
 ynh_mysql_dump_db --database="$db_name" > db.sql
+
+#=================================================
+# RESTART APP
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=1
+
+_ynh_systemd_restart_monitorix
 
 #=================================================
 # END OF SCRIPT

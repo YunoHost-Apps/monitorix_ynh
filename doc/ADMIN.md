@@ -1,34 +1,3 @@
-### Upgrade
-
-By default, a backup is performed before upgrading. To avoid this, you have the following options:
-- Pass the `NO_BACKUP_UPGRADE` env variable with `1` at each upgrade. For example `NO_BACKUP_UPGRADE=1 yunohost app upgrade monitorix`.
-- Set `disable_backup_before_upgrade` to `1`. You can set it with this command:
-
-`yunohost app setting monitorix disable_backup_before_upgrade -v 1`
-
-After that, the settings will be applied for **all** the next updates.
-
-From command line:
-
-`yunohost app upgrade monitorix`
-
-### Backup
-
-This application now uses the core-only feature of the backup. To keep the integrity of the data and to have a better guarantee of the restoration it is recommended to proceed as follows:
-
-- Stop Monitorix service with this command:
-
-`systemctl stop monitorix.service`
-
-- Launch Monitorix backup with this command:
-
-`yunohost backup create --app monitorix`
-
-- Backup your data with your specific strategy (could be with rsync, borg backup or just cp). The data is generally stored in `/var/lib/monitorix`.
-- Restart Monitorix service with theses command:
-
-`systemctl start monitorix.service`
-
 ### Remove
 
 Due of the backup core only feature the data directory in `/var/lib/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
@@ -45,7 +14,7 @@ You will have a full complete documentation for monitorix config here : https://
 
 By example you can extends the basic config by this :
 
-```
+```xml
 priority = 5
 
 <graph_enable>
@@ -238,7 +207,8 @@ priority = 5
 
 ```
 
-In this config we have :
+In this config :
+
 - We set the process priority to 5 (which mean that it will be lower priority than the other process).
 - We get the lmsensor sensor data.
 - We get some sensors data not accessible with lmsensor (with gensens)
