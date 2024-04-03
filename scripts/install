@@ -7,16 +7,22 @@
 #=================================================
 
 source _common.sh
+source experimental_helper.sh
 source /usr/share/yunohost/helpers
+load_vars
+
+ensure_vars_set
 
 #=================================================
-# CHECK EXISTING DIRECTORIES
+# Check datadir empty
 #=================================================
 
-if [ -e "/var/lib/monitorix" ]; then
-    old_data_dir_path="/var/lib/monitorix$(date '+%Y%m%d.%H%M%S')"
-    ynh_print_warn "A data directory already exist. Data was renamed to $old_data_dir_path"
-    mv "/var/lib/monitorix" "$old_data_dir_path"
+if [ -n "$(ls -A $data_dir)" ]; then
+    old_data_dir_path="${data_dir}_$(date '+%Y%m%d.%H%M%S')"
+    ynh_print_warn --message="Data directory was not empty. Data was moved to $old_data_dir_path"
+    mkdir -p $old_data_dir_path
+    mv -t "$old_data_dir_path" "$data_dir"/*
+    app_data_dirs="$(echo /home/yunohost.app/*)"
 fi
 
 #=================================================
@@ -27,27 +33,34 @@ ynh_script_progression --message="Installing packages..." --weight=1
 # Download package and install it
 install_monitorix_package
 
-ynh_systemd_action --service_name="$app" --action="stop" --log_path="systemd" --timeout=15
+ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
+mkdir -p /var/log/new_"${app}"
+mv -t /var/log/new_"${app}" /var/log/monitorix*
+mv /var/log/new_"${app}" /var/log/"${app}"
 
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================ç
-ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
+ynh_script_progression --message="Adding configurations related to $app..." --weight=1
 
-ynh_add_systemd_config
-yunohost service add "$app" --description="Monitorix" --log=systemd
+ynh_add_jinja_config --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
+ynh_add_jinja_config --template=nginx_status.conf --destination "$nginx_status_conf"
 
-ynh_add_config --template "nginx_status.conf" --destination "$nginx_status_conf"
 ynh_add_nginx_config
+ynh_add_systemd_config
 
-#=================================================
-# SPECIFIC SETUP
-#=================================================
-# ADD A CONFIGURATION
-#=================================================
-ynh_script_progression --message="Adding a configuration file..." --weight=1
+yunohost service add "$app" --description=Monitorix --log=systemd
 
-config_monitorix
+ynh_script_progression --message="Configuring databases access..."
+configure_db
+
+ynh_script_progression --message="Configuring php fpm access if needed..."
+if "$phpfpm_installed"; then
+    config_php_fpm
+fi
+
+configure_hooks
+configure_alerts_email
 
 #=================================================
 # GENERIC FINALIZATION
@@ -56,12 +69,15 @@ ynh_script_progression --message="Protecting directory..."
 
 set_permission
 
+ynh_use_logrotate --logfile "/var/log/$app"
+
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=1
 
-_ynh_systemd_restart_monitorix
+ynh_systemd_action --service_name="$app" --action="start" --log_path 'systemd' --line_match ' - Ok, ready.'
+save_vars_current_value
 
 #=================================================
 # END OF SCRIPT

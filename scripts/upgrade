@@ -7,12 +7,20 @@
 #=================================================
 
 source _common.sh
+source experimental_helper.sh
 source /usr/share/yunohost/helpers
+load_vars
 
 upgrade_type=$(ynh_check_app_version_changed)
 
 #=================================================
 # STANDARD UPGRADE STEPS
+#=================================================
+# MIGRATION 5 : Manage old settings
+#=================================================
+
+ensure_vars_set
+
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
@@ -29,7 +37,7 @@ ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 #=================================================
 ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name=$app --action=stop --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # "REBUILD" THE APP (DEPLOY NEW SOURCES, RERUN NPM BUILD...)
@@ -37,36 +45,57 @@ ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+if [ "$upgrade_type" == UPGRADE_APP ]
 then
-	ynh_script_progression --message="Upgrading source files..." --weight=1
+    ynh_script_progression --message="Upgrading source files..." --weight=1
 
-	# Download, check integrity, uncompress and patch the source from manifest.toml
-	install_monitorix_package
+    # Download, check integrity, uncompress and patch the source from manifest.toml
+    install_monitorix_package
 fi
 
-ynh_systemd_action --service_name="$app" --action="stop" --log_path="systemd" --timeout=15
+ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
+
+#=================================================
+# MIGRATION 2
+#=================================================
+
+# Migrate log files
+if [ ! -d /var/log/"${app}" ]; then
+    mkdir -p /var/log/new_"${app}"
+    mv -t /var/log/new_"${app}" /var/log/monitorix*
+    mv /var/log/new_"${app}" /var/log/"${app}"
+fi
+
+# Migrate data directory
+if [ -e /var/lib/monitorix/system.rrd ] && [ ! -e "$data_dir"/system.rrd ] ; then
+    mv -tf "$data_dir/" /var/lib/monitorix/*
+fi
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression --message="Upgrading configurations related to $app..." --weight=1
 
-ynh_add_config --template "nginx_status.conf" --destination "$nginx_status_conf"
+ynh_add_jinja_config --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
+ynh_add_jinja_config --template=nginx_status.conf --destination "$nginx_status_conf"
+if "$phpfpm_installed"; then
+    config_php_fpm
+fi
 ynh_add_nginx_config
-
 ynh_add_systemd_config
 
-yunohost service add $app --description="Monitorix" --log="systemd"
+yunohost service add "$app" --description=Monitorix --log=systemd
 
-#=================================================
-# RECONFIGURE THE APP (UPDATE CONF, APPLY MIGRATIONS...)
-#=================================================
-# UPDATE A CONFIG FILE
-#=================================================
-ynh_script_progression --message="Updating a configuration file..." --weight=1
+ynh_script_progression --message="Configuring databases access..."
+configure_db
 
-config_monitorix
+ynh_script_progression --message="Configuring php fpm access if needed..."
+if "$phpfpm_installed"; then
+    config_php_fpm
+fi
+
+configure_hooks
+configure_alerts_email
 
 #=================================================
 # GENERIC FINALIZATION
@@ -75,12 +104,15 @@ ynh_script_progression --message="Protecting directory..."
 
 set_permission
 
+ynh_use_logrotate --logfile "/var/log/$app"
+
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=1
 
-_ynh_systemd_restart_monitorix
+ynh_systemd_action --service_name="$app" --action=restart --log_path=systemd --line_match ' - Ok, ready.'
+save_vars_current_value
 
 #=================================================
 # END OF SCRIPT

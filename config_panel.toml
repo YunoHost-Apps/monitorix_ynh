@@ -1,0 +1,246 @@
+version = "1.0"
+
+[main]
+name.en = "Main configuration"
+name.fr = "Configuration principale"
+
+services = ["__APP__"]
+
+    [main.email_alerts]
+
+    name = "Email alerts"
+
+        [main.email_alerts.alerts_email]
+
+        ask.en = "Email address to send alerts emails"
+        type = "email"
+        help = "The Email address on which monitorix will send Alets email. It could by linked to many time of alerts."
+
+    [main.others]
+
+    name = "Others"
+
+        [main.others.theme_color]
+        ask.en = "Theme color"
+        type = "select"
+        choices = ["black", "white"]
+        help = "RRDtool comes with a default white theme, and since Monitorix introduces its own black theme, you have two predefined themes to choose from."
+
+        [main.others.enable_hourly_view]
+        ask.en = "Enable hourly view"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+        help = "This option enables or disables the ability to select the hourly view in the main page.\nNo .rrd file will change by selecting this option and the historical data won’t be affected."
+
+        [main.others.image_format]
+        ask.en = "Image format"
+        type = "select"
+        choices = ["svg", "png"]
+        help = "This is the format of each generated graph. There are only two possible values: PNG and SVG."
+
+        [main.others.max_historic_years]
+        ask.en = "Maximum number of years of historical"
+        type = "number"
+        help = "This option defines the maximum number of years of historical data in all graphs.\nWARNING: Every time this value is extended Monitorix will resize every .rrd file accordingly, removing all historical data.\nThere is no longer any upper limit for this value."
+
+        [main.others.process_priority]
+        ask.en = "Process priority"
+        type = "number"
+        min = -20
+        max = 20
+        help = "Sometimes when a server is under heavy use, Monitorix might be unable to collect some statistical data due to its normal priority (0 by default). This makes monitoring useless because graphs are empty during that hard period of time.\n\nIn order to mitigate this situation this option sets the priority in which Monitorix will be scheduled by the kernel. The accepted range of values is the same as in the setpriority() system call: that is, from -20 (maximum priority) to 19 (lowest priority)."
+
+[config]
+name.en = "Monitorix configuration"
+
+    [config.system]
+    name = "System load average and usage"
+
+        [config.system.system_alerts_loadavg_enabled]
+        ask.en = "Load average enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+        help = "This section enables or disables the alert capabilities for this graph. Only the alert for the average CPU load is currently implemented. It works as follows:\n\nThis alert uses the minimum value between the second and the third load averages (those that represent the last 5 and 15 minutes), and if it reaches the loadavg_threshold value for the interval of time defined in loadavg_timeintvl, Monitorix will execute the external alert script defined in loadavg_script.\n\nThe idea to use min(load5, load15) is to obtain a more symmetric curve and a sooner cancellation of the alert.\n\nThe default Monitorix installation includes an example of a shell-script alert called monitorix-alert.sh which you can use as a base for your own script."
+
+        [config.system.system_alerts_loadavg_timeintvl]
+        ask.en = "Load average time interval"
+        type = "number"
+        help = "This is the period of time (in seconds) that the threshold needs to be exceeded before the external alert script is executed."
+
+        [config.system.system_alerts_loadavg_threshold]
+        ask.en = "Load average threshold"
+        type = "range"
+        help = "This is the value that needs to be reached or exceeded within the specified time period in loadavg_timeintvl to trigger the mechanism for a particular action, which in this case is the execution of an external alert script.\n\nThe value of this option is compared against the last 15 minutes of CPU load average."
+
+    [config.disk]
+    name = "Disk usage"
+
+        [config.disk.disk_alerts_loadavg_enabled]
+        ask.en = "Disk alert enabled"
+        type = "boolean"
+        yes = "true"
+        no = "false"
+
+        [config.disk.disk_alerts_loadavg_timeintvl]
+        ask.en = "Time interval"
+        type = "number"
+        help = "Time interval on which disk usage will be checked"
+
+        [config.disk.disk_alerts_loadavg_threshold]
+        ask.en = "Disk usage threshold"
+        type = "number"
+        help = "Percentage to reach to send alert."
+
+    [config.mail]
+    name = "Mail statistics"
+
+        [config.mail.mail_delvd_enabled]
+        ask.en = "Mail delivery enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+        help = "This section enables or disables one of the alert capabilities for this graph; the alert for the number of delivered messages. It works as follows:\n\nIf the number of delivered messages reaches the delvd_threshold value for the interval of time defined in delvd_timeintvl, Monitorix will execute the external alert script defined in delvd_script.\n\nThe default Monitorix installation includes an example of a shell-script alert called monitorix-alert.sh which you can use as a base for your own script."
+
+        [config.mail.mail_delvd_timeintvl]
+        ask.en = "Mail delivery time interval"
+        type = "number"
+        help = "This is the period of time (in seconds) that the threshold needs to be exceeded before the external alert script is executed."
+
+        [config.mail.mail_delvd_threshold]
+        ask.en = "Mail delivery threshold"
+        type = "number"
+        help = "This is the value that needs to be reached or exceeded within the specified time period in delvd_timeintvl to trigger the mechanism for a particular action, which in this case is the execution of an external alert script.\n\nThe value of this option is compared against the number of delivered messages since the last delvd_timeintvl seconds."
+
+        [config.mail.mail_mqueued_enabled]
+        ask.en = "Mail message queue enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+        help = "This section enables or disables one of the alert capabilities for this graph; the alert for the number of queued messages. It works as follows:\n\nIf the number of queued messages reaches the mqueued_threshold value for the interval of time defined in mqueued_timeintvl, Monitorix will execute the external alert script defined in mqueued_script.\n\nThe default Monitorix installation includes an example of a shell-script alert called monitorix-alert.sh which you can use as a base for your own script."
+
+        [config.mail.mail_mqueued_timeintvl]
+        ask.en = "Mail message queue time interval"
+        type = "number"
+        help = "This is the period of time (in seconds) that the threshold needs to be exceeded before the external alert script is executed."
+
+        [config.mail.mail_mqueued_threshold]
+        ask.en = "Mail message queue threshold"
+        type = "number"
+        help = "This is the value that needs to be reached or exceeded within the specified time period in mqueued_timeintvl to trigger the mechanism for a particular action, which in this case is the execution of an external alert script.\n\nThe value of this option is compared with the number of messages in the mail queue."
+
+[emailreports]
+name = "Automatic email reports"
+help = "This allows to send automatically selected graphs to one or more email addresses. This could be specially useful for some system administrators who prefer receiving via email selected graphs instead of browsing to the remote servers every day."
+
+    [emailreports.global]
+    name = "Global config for email reports"
+
+        [emailreports.global.emailreports_enabled]
+        ask.en = "Mail reports enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+        help = "This option enables this feature. Note that you still need to enable the same option for each time interval you want to activate: daily, weekly, monthly, yearly."
+
+        [emailreports.global.emailreports_subject_prefix]
+        ask.en = "Email report subject prefix"
+        type = "string"
+        help = "This is a string that will be prefixed in the Subject of all emails that will be sent."
+
+        [emailreports.global.emailreports_hour]
+        ask.en = "Mail report send hour"
+        type = "number"
+        max = 23
+        help = "This is the hour (in 24h format) when the email reports will be sent."
+
+        [emailreports.global.emailreports_minute]
+        ask.en = "Mail report send minute"
+        type = "number"
+        max = 59
+        help = "This is the minute when the email reports will be sent."
+
+    [emailreports.daily]
+    name = "Daily email reports"
+    help = "Daily reports will be sent every day at the specific time on the global mail report settings."
+
+        [emailreports.daily.emailreports_daily_enabled]
+        ask.en = "Daily mail reports enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+
+        [emailreports.daily.emailreports_daily_graphs]
+        ask.en = "Daily mail reports graphs list"
+        type = "tags"
+        choices = ["system", "kern", "proc", "fs", "du", "net", "netstat", "process", "serv", "mail", "port", "user", "nginx", "mysql", "pgsql", "fail2ban", "memcached", "redis", "phpfpm", "int"]
+        help = "List of graph names you want to appear in the email report. The names are the same as their .rrd files. There is a list of them in the graph_name option in monitorix.conf."
+
+        [emailreports.daily.emailreports_daily_to]
+        ask.en = "Daily mail reports emails"
+        type = "string"
+        help = "This is a comma-separated list of recipient email addresses."
+
+    [emailreports.weekly]
+    name = "Weekly email reports"
+    help = "Weekly reports will be sent the first Monday of each week."
+
+        [emailreports.weekly.emailreports_weekly_enabled]
+        ask.en = "Weekly mail reports enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+
+        [emailreports.weekly.emailreports_weekly_graphs]
+        ask.en = "Weekly mail reports graphs list"
+        type = "tags"
+        choices = ["system", "kern", "proc", "fs", "du", "net", "netstat", "process", "serv", "mail", "port", "user", "nginx", "mysql", "pgsql", "fail2ban", "memcached", "redis", "phpfpm", "int"]
+        help = "List of graph names you want to appear in the email report. The names are the same as their .rrd files. There is a list of them in the graph_name option in monitorix.conf."
+
+        [emailreports.weekly.emailreports_weekly_to]
+        ask.en = "Weekly mail reports emails"
+        type = "string"
+        help = "This is a comma-separated list of recipient email addresses."
+
+    [emailreports.monthly]
+    name = "Monthly email reports"
+    help = "Monthly reports will be sent the first day of each month."
+
+        [emailreports.monthly.emailreports_monthly_enabled]
+        ask.en = "Monthly mail reports enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+
+        [emailreports.monthly.emailreports_monthly_graphs]
+        ask.en = "Monthly mail reports graphs list"
+        type = "tags"
+        choices = ["system", "kern", "proc", "fs", "du", "net", "netstat", "process", "serv", "mail", "port", "user", "nginx", "mysql", "pgsql", "fail2ban", "memcached", "redis", "phpfpm", "int"]
+        help = "List of graph names you want to appear in the email report. The names are the same as their .rrd files. There is a list of them in the graph_name option in monitorix.conf."
+
+        [emailreports.monthly.emailreports_monthly_to]
+        ask.en = "Monthly mail reports emails"
+        type = "string"
+        help = "This is a comma-separated list of recipient email addresses."
+
+    [emailreports.yearly]
+    name = "Yearly email reports"
+    help = "Yearly reports will be sent the first day of each year."
+
+        [emailreports.yearly.emailreports_yearly_enabled]
+        ask.en = "Yearly mail reports enabled"
+        type = "boolean"
+        yes = "y"
+        no = "n"
+
+        [emailreports.yearly.emailreports_yearly_graphs]
+        ask.en = "Yearly mail reports graphs list"
+        type = "tags"
+        choices = ["system", "kern", "proc", "fs", "du", "net", "netstat", "process", "serv", "mail", "port", "user", "nginx", "mysql", "pgsql", "fail2ban", "memcached", "redis", "phpfpm", "int"]
+        help = "List of graph names you want to appear in the email report. The names are the same as their .rrd files. There is a list of them in the graph_name option in monitorix.conf."
+
+        [emailreports.yearly.emailreports_yearly_to]
+        ask.en = "Yearly mail reports emails"
+        type = "string"
+        help = "This is a comma-separated list of recipient email addresses."
