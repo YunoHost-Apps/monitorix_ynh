@@ -130,6 +130,7 @@ config_php_fpm() {
 }
 
 configure_hooks() {
+    ynh_replace_string --match_string=__APP__ --replace_string="$app" --target_file=../hooks/post_iptable_rules
     ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_install
     ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_remove
     ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_upgrade
