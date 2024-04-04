@@ -68,7 +68,7 @@ fi
 
 # Migrate data directory
 if [ -e /var/lib/monitorix/system.rrd ] && [ ! -e "$data_dir"/system.rrd ] ; then
-    mv -tf "$data_dir/" /var/lib/monitorix/*
+    mv -f -t "$data_dir/" /var/lib/monitorix/*
 fi
 
 #=================================================
