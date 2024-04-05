@@ -70,14 +70,19 @@ load_vars() {
         grep -E -v '^/run|^/dev|^/proc|^/sys|^/snap')"
     app_data_dirs="$(echo /home/yunohost.app/*)"
     readonly home_user_dirs="$(echo /home/* | home_dir_filter)"
-    # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
-    readonly php_pools_infos="$(grep -E '^\[.*\]' \
-            --exclude=/etc/php/*/fpm/pool.d/"$app"_status.conf \
-            --exclude=/etc/php/7.*/fpm/pool.d/* /etc/php/*/fpm/pool.d/* |
-        sed -E 's|/etc/php/([[:digit:]]\.[[:digit:]]+)/fpm/pool.d/.+\.conf\:\[(.+)\]|\1,\2|' |
-        installed_php_fpm_filter)"
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
+
+    if compgen -G /etc/php/*/fpm/pool.d; then
+        # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
+        readonly php_pools_infos="$(grep -E '^\[.*\]' \
+                --exclude=/etc/php/*/fpm/pool.d/"$app"_status.conf \
+                --exclude=/etc/php/7.*/fpm/pool.d/* /etc/php/*/fpm/pool.d/* |
+            sed -E 's|/etc/php/([[:digit:]]\.[[:digit:]]+)/fpm/pool.d/.+\.conf\:\[(.+)\]|\1,\2|' |
+            installed_php_fpm_filter)"
+    else
+        readonly php_pools_infos=''
+    fi
 }
 
 # Used by update_config_if_needed.sh hook
