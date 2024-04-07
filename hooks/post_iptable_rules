@@ -1,7 +1,6 @@
 #/bin/bash
 
-if [[ $(systemctl status __APP__.service | grep "Active" | cut -d'(' -f2 | cut -d ')' -f1) = 'running' ]]
-then
+if systemctl is-active __APP__.service  --quiet; then
     systemctl stop monitorix.service
     sleep 1
     pkill -f "monitorix-httpd listening on" || true
