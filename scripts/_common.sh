@@ -32,12 +32,16 @@ home_dir_filter() {
 
 interface_speed_map() {
     while read -r item; do
-        speed=$(cat /sys/class/net/"$item"/speed || echo 1000)
+        speed=$(cat /sys/class/net/"$item"/speed 2>/dev/null || echo 1000)
         echo "$item,$speed"
     done
 }
 
 load_vars() {
+    # Big warning here
+    # This function is called by the hook in install/upgrade/remove yunohost operation
+    # We we need to ensure that this function the quickest as possible
+    # Note that we don't use the yunohost command internationally for optimization
     if ynh_package_is_installed --package=mysql; then
         readonly mysql_installed=true
     else
@@ -72,6 +76,47 @@ load_vars() {
     readonly home_user_dirs="$(echo /home/* | home_dir_filter)"
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
+    readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1)"
+    readonly ssh_port="$((grep ssh_port /etc/yunohost/settings.yml || echo 22) | cut -d: -f2 | xargs)"
+    readonly port_infos="$(python3 <<EOF
+import yaml, socket
+hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
+with open("/etc/yunohost/firewall.yml", "r") as f:
+    firewall = yaml.safe_load(f)
+    tcp4_port_list = [str(port) for port in firewall['ipv4']['TCP']
+                      if str(port) not in hard_coded_ports]
+    tcp6_port_list = [str(port) for port in firewall['ipv6']['TCP']
+                      if str(port) not in hard_coded_ports]
+    udp4_port_list = [str(port) for port in firewall['ipv4']['UDP']
+                      if str(port) not in hard_coded_ports]
+    udp6_port_list = [str(port) for port in firewall['ipv6']['UDP']
+                      if str(port) not in hard_coded_ports]
+with open("/etc/yunohost/services.yml", "r") as f:
+    services = yaml.safe_load(f)
+    port_map = dict()
+    for key, value in services.items():
+        if 'needs_exposed_ports' in value:
+            for port in value['needs_exposed_ports']:
+                port_map[str(port)] = key
+
+def generate_port_info(proto, ip_version, port):
+    if port in port_map:
+        name = port_map[port]
+    else:
+        try:
+            name = socket.getservbyport(int(port), proto)
+        except:
+            name = "Port_" + port
+    return "%s,%s,%s,%s" % (port, ip_version, proto, name)
+
+result = [generate_port_info("tcp", "4", port) for port in tcp4_port_list] + \
+         [generate_port_info("tcp", "6", port) for port in tcp6_port_list] + \
+         [generate_port_info("udp", "4", port) for port in udp4_port_list] + \
+         [generate_port_info("udp", "6", port) for port in udp6_port_list]
+result.sort()
+print('\n'.join(result))
+EOF
+)"
 
     if compgen -G /etc/php/*/fpm/pool.d; then
         # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
