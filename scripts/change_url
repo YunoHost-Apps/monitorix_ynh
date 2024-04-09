@@ -7,7 +7,9 @@
 #=================================================
 
 source _common.sh
+source experimental_helper.sh
 source /usr/share/yunohost/helpers
+load_vars
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -29,8 +31,7 @@ ynh_change_url_nginx_config
 # SPECIFIC MODIFICATIONS
 #=================================================
 ynh_script_progression --message="Updating a configuration file..." --weight=1
-
-config_monitorix
+ynh_add_jinja_config --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
 
 #=================================================
 # GENERIC FINALISATION
@@ -38,8 +39,7 @@ config_monitorix
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=1
-
-_ynh_systemd_restart_monitorix
+ynh_systemd_action --service_name="$app" --action=start --log_path 'systemd' --line_match ' - Ok, ready.'
 
 #=================================================
 # END OF SCRIPT
