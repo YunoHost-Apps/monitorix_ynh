@@ -7,7 +7,7 @@ readonly nginx_status_conf="/etc/nginx/conf.d/${app}_status.conf"
 
 readonly db_user=$app
 
-readonly var_list_to_manage='mysql_installed postgresql_installed memcached_installed redis_installed phpfpm_installed jail_list mount_parts home_user_dirs php_pools_infos net_gateway net_interface_list'
+readonly var_list_to_manage='mysql_installed postgresql_installed memcached_installed redis_installed phpfpm_installed jail_list mount_parts home_user_dirs net_gateway net_interface_list net_max_speed ssh_port port_infos php_pools_infos'
 
 #=================================================
 # DEFINE ALL COMMON FONCTIONS
