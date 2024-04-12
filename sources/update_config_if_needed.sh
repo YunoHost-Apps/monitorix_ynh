@@ -18,6 +18,7 @@ for var in $var_list_to_manage; do
     value="$(ynh_app_setting_get --app="$app" --key=previous_$var)"
     if [ "${!var}" != "$value" ]; then
         status_dirty=true
+        ynh_print_info --message="The setting '$var' changed. Updating monitorix config."
         break
     fi
 done
@@ -29,7 +30,6 @@ if "$status_dirty"; then
     domain="$(ynh_app_setting_get --app="$app" --key=domain)"
     path="$(ynh_app_setting_get --app="$app" --key=path)"
     port="$(ynh_app_setting_get --app="$app" --key=port)"
-    port_nginx_status="$(ynh_app_setting_get --app="$app" --key=port_nginx_status)"
     port_nginx_status="$(ynh_app_setting_get --app="$app" --key=port_nginx_status)"
 
     alerts_email="$(ynh_app_setting_get --app="$app" --key=alerts_email)"
