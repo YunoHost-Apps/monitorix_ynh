@@ -44,7 +44,7 @@ load_vars() {
     # Big warning here
     # This function is called by the hook in install/upgrade/remove yunohost operation
     # We we need to ensure that this function the quickest as possible
-    # Note that we don't use the yunohost command internationally for optimization
+    # Note that we don't use the yunohost command intentionally for optimization
     if ynh_package_is_installed --package=mysql; then
         readonly mysql_installed=true
     else
