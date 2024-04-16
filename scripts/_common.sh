@@ -33,6 +33,9 @@ home_dir_filter() {
 interface_speed_map() {
     while read -r item; do
         speed=$(cat /sys/class/net/"$item"/speed 2>/dev/null || echo 1000)
+        if [ "$speed" == -1 ]; then
+            speed=1000
+        fi
         echo "$item,$speed"
     done
 }
