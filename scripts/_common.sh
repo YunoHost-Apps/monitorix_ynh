@@ -71,7 +71,7 @@ load_vars() {
         grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')"
     readonly mount_parts="$(mount |
         cut -d' '  -f3 |
-        grep -E -v '^/run|^/dev|^/proc|^/sys|^/snap')"
+        grep -E -v '^/run|^/dev|^/proc|^/sys|^/snap|^/$')"
     app_data_dirs="$(echo /home/yunohost.app/*)"
     readonly home_user_dirs="$(echo /home/* | home_dir_filter)"
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
