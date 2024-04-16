@@ -125,7 +125,7 @@ import yaml, socket
 hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
-    results = ["%s|%s" % (k, v["description"]) for k, v in services.items()]
+    results = ["%s|%s" % (k, v["description"] if "description" in v else k) for k, v in services.items()]
     print('\n'.join(results))
 EOF
 )"
