@@ -1,6 +1,6 @@
 ### Remove
 
-Due of the backup core only feature the data directory in `/var/lib/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
+Due of the backup core only feature the data directory in `/home/yunohost.app/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
 
 ### More sensor
 
@@ -15,14 +15,10 @@ You will have a full complete documentation for monitorix config here : https://
 By example you can extends the basic config by this :
 
 ```xml
-priority = 5
-
 <graph_enable>
-
         disk            = y
         lmsens          = y
         gensens         = y
-        mail            = y
 </graph_enable>
 
 # LMSENS graph
@@ -97,123 +93,10 @@ priority = 5
                 pendsect_script = /etc/monitorix/monitorix_alerts_scripts/disk_pendsect.sh
         </alerts>
 </disk>
-
-# FS graph
-# -----------------------------------------------------------------------------
-<fs>
-        <list>
-                0 = /, /home, /var, /$tempdir, swap
-        </list>
-        <desc>
-                / = Root FS
-                /home = home
-                /var = var
-                /$tempdir = tmp
-        </desc>
-        <devmap>
-        </devmap>
-        rigid = 2, 0, 2, 0
-        limit = 100, 1000, 100, 1000
-        <alerts>
-            / = 3600, 98, /etc/monitorix/monitorix_alerts_scripts/fs_rootfs.sh
-            /home = 3600, 98, /etc/monitorix/monitorix_alerts_scripts/fs_home.sh
-            /var = 3600, 98, /etc/monitorix/monitorix_alerts_scripts/fs_var.sh
-            /$tempdir = 3600, 98, /etc/monitorix/monitorix_alerts_scripts/fs_tmp.sh
-            swap = 3600, 98, /etc/monitorix/monitorix_alerts_scripts/fs_swap.sh
-        </alerts>
-</fs>
-
-
-# MAIL graph
-# -----------------------------------------------------------------------------
-<mail>
-        mta = postfix
-        greylist = postgrey
-        stats_rate = real
-        rigid = 0, 0, 0, 0, 0
-        limit = 1, 1000, 1000, 1000, 1000
-        <alerts>
-                delvd_enabled = y
-                delvd_timeintvl = 60
-                delvd_threshold = 100
-                delvd_script = /etc/monitorix/monitorix_alerts_scripts/mail_delvd.sh
-                mqueued_enabled = y
-                mqueued_timeintvl = 3600
-                mqueued_threshold = 100
-                mqueued_script = /etc/monitorix/monitorix_alerts_scripts/mail_mqueued.sh
-        </alerts>
-</mail>
-
-
-# NET graph
-# -----------------------------------------------------------------------------
-<net>
-        list = eth0,lo
-        <desc>
-                eth0 = FastEthernet LAN, 0, 10000000
-                lo = loopback, 0, 10000000
-        </desc>
-
-        gateway = eth0
-</net>
-
-# PROCESS graph
-# -----------------------------------------------------------------------------
-<process>
-        <list>
-                0 = sshd, ntpd, monitorix, monitorix-httpd
-                1 = openvpn, ...
-                ...
-                6 = mysqld, slapd, postgresql
-        </list>
-        <desc>
-                master = Postfix
-                imap = Dovecot
-        </desc>
-        rigid = 2, 0, 0, 0, 0, 0, 0, 0
-        limit = 100, 1000, 1000, 1000, 1000, 1000, 1000, 1000
-</process>
-
-
-
-<emailreports>
-        enabled = y
-        url_prefix = http://127.0.0.1:8081/monitorix
-        smtp_hostname = localhost
-        from_address = noreply@domain.tld
-        hour = 2
-        minute = 7
-        <daily>
-                enabled = y
-                graphs = system, fs, gensens, disk, netstat, port, nginx
-                to = user@domain.tld
-        </daily>
-        <weekly>
-                enabled = y
-                graphs = system, fs, gensens, disk, kern, proc, net, netstat, process, serv, port, user, nginx, mysql, fail2ban, int
-                to = user@domain.tld
-        </weekly>
-        <monthly>
-                enabled = y
-                graphs = system, fs, gensens, disk, kern, proc, net, netstat, process, serv, port, user, nginx, mysql, fail2ban, int
-                to = user@domain.tld
-        </monthly>
-        <yearly>
-                enabled = y
-                graphs = system, fs, gensens, disk, kern, proc, net, netstat, process, serv, port, user, nginx, mysql, fail2ban, int
-                to = user@domain.tld
-        </yearly>
-</emailreports>
-
 ```
 
 In this config :
 
-- We set the process priority to 5 (which mean that it will be lower priority than the other process).
 - We get the lmsensor sensor data.
 - We get some sensors data not accessible with lmsensor (with gensens)
 - We check the disk health and send an email if any error happens. For that you need to make some script. An example is available in `/usr/share/doc/monitorix/monitorix-alert.sh`.
-- We check the filesystem.
-- We check the traffic in the network card.
-- We check some process.
-- We send every day, week, month and year a rapport.

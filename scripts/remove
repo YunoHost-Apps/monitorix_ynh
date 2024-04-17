@@ -7,7 +7,9 @@
 #=================================================
 
 source _common.sh
+source experimental_helper.sh
 source /usr/share/yunohost/helpers
+load_vars
 
 #=================================================
 # STANDARD REMOVE
@@ -18,8 +20,8 @@ source /usr/share/yunohost/helpers
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
 if ynh_exec_warn_less yunohost service status $app >/dev/null
 then
-	ynh_script_progression --message="Removing $app service integration..." --weight=3
-	yunohost service remove "$app"
+    ynh_script_progression --message="Removing $app service integration..." --weight=3
+    yunohost service remove "$app"
 fi
 
 #=================================================
@@ -34,9 +36,27 @@ ynh_remove_nginx_config
 
 ynh_remove_systemd_config
 
-#=================================================
-# END OF SCRIPT
-#=================================================
-ynh_print_info --message="Due of the backup core only feature the data directory in '/var/lib/monitorix' was not removed. It need to be removed manually to purge app user data."
+# Remove the app-specific logrotate config
+ynh_remove_logrotate
+
+for pool_dir_by_version in /etc/php/*; do
+    pool_version=$(echo "$pool_dir_by_version" | cut -d/ -f4)
+    pool_file="/etc/php/$pool_version/fpm/pool.d/${app}_status.conf"
+    ynh_secure_remove --file="$pool_file"
+    if ynh_package_is_installed --package="php$pool_version-fpm"; then
+        ynh_systemd_action --service_name="php$pool_version"-fpm.service --action=reload
+    fi
+done
+
+if ynh_psql_user_exists --user=$db_user; then
+    ynh_psql_drop_user $db_user
+fi
+if ynh_mysql_user_exists --user=$db_user; then
+    ynh_mysql_drop_user $db_user
+fi
+
+ynh_package_autopurge monitorix
+ynh_secure_remove --file=/var/log/"$app"
+ynh_secure_remove --file="$install_dir"
 
 ynh_script_progression --message="Removal of $app completed" --last

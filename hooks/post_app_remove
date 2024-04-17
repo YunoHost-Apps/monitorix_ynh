@@ -1,0 +1,3 @@
+#!/bin/bash
+
+bash __INSTALL_DIR__/update_config_if_needed.sh

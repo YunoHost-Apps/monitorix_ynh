@@ -8,14 +8,16 @@
 
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
+source ../settings/scripts/experimental_helper.sh
 source /usr/share/yunohost/helpers
+load_vars
 
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
-
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+if systemctl is-active $app.service --quiet; then
+    ynh_print_warn --message="It's highly recommended to make your backup when the service is stopped. Please stop $app service with this command before to run the backup 'systemctl stop $app.service'"
+fi
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
@@ -26,8 +28,12 @@ ynh_print_info --message="Declaring files to be backed up..."
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
+ynh_backup --src_path="/etc/$app/"
 ynh_backup --src_path "/etc/nginx/conf.d/$domain.d/$app.conf"
-ynh_backup --src_path "/etc/nginx/conf.d/monitorix_status.conf"
+ynh_backup --src_path "$nginx_status_conf"
+
+ynh_print_info --message="Backing up code..."
+ynh_backup --src_path $install_dir
 
 #=================================================
 # SPECIFIC BACKUP
@@ -41,26 +47,7 @@ ynh_backup --src_path "/etc/systemd/system/$app.service"
 # BACKUP VARIOUS FILES
 #=================================================
 
-ynh_backup --src_path "/var/lib/$app" --is_big=1
-
-ynh_backup --src_path="/etc/$app/"
-
-#=================================================
-# BACKUP THE MYSQL DATABASE
-#=================================================
-ynh_print_info --message="Backing up the MySQL database..."
-
-### (However, things like MySQL dumps *do* take some time to run, though the
-### copy of the generated dump to the archive still happens later)
-
-ynh_mysql_dump_db --database="$db_name" > db.sql
-
-#=================================================
-# RESTART APP
-#=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
-
-_ynh_systemd_restart_monitorix
+ynh_backup --src_path="$data_dir" --is_big=1
 
 #=================================================
 # END OF SCRIPT

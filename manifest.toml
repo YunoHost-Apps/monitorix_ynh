@@ -7,9 +7,9 @@ name = "Monitorix"
 description.en = "A system monitoring tool"
 description.fr = "Un outil de monitoring système"
 
-version = "3.15.0~ynh4"
+version = "3.15.0~ynh5"
 
-maintainers = ["Josue-T"]
+maintainers = ["Josué Tille"]
 
 [upstream]
 license = "GPL-2.0"
@@ -37,15 +37,25 @@ ram.runtime = "50M"
     type = "path"
     default = "/monitorix"
 
+[install.init_main_permission]
+    type = "group"
+    default = "admins"
+
 [resources]
     [resources.sources.main]
     url = "https://www.monitorix.org/monitorix_3.15.0-izzy1_all.deb"
     sha256 = "0d960b9433ecbaba38d9befe27163644886fb5a466d44f5380576ca975b9d8e4"
     rename = "monitorix.deb"
-    format = "whatever"
     extract = false
 
     [resources.system_user]
+
+    [resources.install_dir]
+    dir = "/opt/yunohost/__APP__"
+    owner = "__APP__:rwx"
+    group = "www-data:rx"
+
+    [resources.data_dir]
 
     [resources.permissions]
     main.url = "/"
@@ -55,9 +65,5 @@ ram.runtime = "50M"
     nginx_status.default = 8081
 
     [resources.apt]
-    packages = [
-        "mariadb-server",
-    ]
+    packages = ["libdbd-pg-perl", "pflogsumm"]
 
-    [resources.database]
-    type = "mysql"
