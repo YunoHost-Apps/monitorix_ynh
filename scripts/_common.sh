@@ -79,7 +79,7 @@ load_vars() {
     readonly home_user_dirs="$(echo /home/* | home_dir_filter)"
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
-    readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1)"
+    readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1 | sed 's|-1|1000|g')"
     readonly ssh_port="$((grep ssh_port /etc/yunohost/settings.yml || echo 22) | cut -d: -f2 | xargs)"
     readonly port_infos="$(python3 <<EOF
 import yaml, socket
