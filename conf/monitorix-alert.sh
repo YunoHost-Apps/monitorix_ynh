@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Example script used to execute an alert action.
 #
