@@ -96,6 +96,8 @@ with open("/etc/yunohost/firewall.yml", "r") as f:
                       if str(port) not in hard_coded_ports]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
+    if services is None:
+        services = dict()
     port_map = dict()
     for key, value in services.items():
         if 'needs_exposed_ports' in value:
@@ -125,6 +127,8 @@ import yaml, socket
 hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
+    if services is None:
+        services = dict()
     results = ["%s|%s" % (k, v["description"] if "description" in v else k) for k, v in services.items()]
     print('\n'.join(results))
 EOF
