@@ -29,11 +29,11 @@ ynh_print_info --message="Declaring files to be backed up..."
 #=================================================
 
 ynh_backup --src_path="/etc/$app/"
-ynh_backup --src_path "/etc/nginx/conf.d/$domain.d/$app.conf"
-ynh_backup --src_path "$nginx_status_conf"
+ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup --src_path="$nginx_status_conf"
 
 ynh_print_info --message="Backing up code..."
-ynh_backup --src_path $install_dir
+ynh_backup --src_path=$install_dir
 
 #=================================================
 # SPECIFIC BACKUP
@@ -41,7 +41,7 @@ ynh_backup --src_path $install_dir
 # BACKUP SYSTEMD
 #=================================================
 
-ynh_backup --src_path "/etc/systemd/system/$app.service"
+ynh_backup --src_path="/etc/systemd/system/$app.service"
 
 #=================================================
 # BACKUP VARIOUS FILES
