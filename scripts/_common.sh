@@ -149,7 +149,7 @@ EOF
 # Used by update_config_if_needed.sh hook
 save_vars_current_value() {
     for var in $var_list_to_manage; do
-        ynh_app_setting_set --app="$app" --key=previous_$var --value="${!var}"
+        ynh_app_setting_set --app="$app" --key="previous_$var" --value="${!var}"
     done
 }
 

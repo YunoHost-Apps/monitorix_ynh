@@ -17,10 +17,10 @@ ensure_vars_set
 # Check datadir empty
 #=================================================
 
-if [ -n "$(ls -A $data_dir)" ]; then
+if [ -n "$(ls -A "$data_dir")" ]; then
     old_data_dir_path="${data_dir}_$(date '+%Y%m%d.%H%M%S')"
     ynh_print_warn --message="Data directory was not empty. Data was moved to $old_data_dir_path"
-    mkdir -p $old_data_dir_path
+    mkdir -p "$old_data_dir_path"
     mv -t "$old_data_dir_path" "$data_dir"/*
     app_data_dirs="$(echo /home/yunohost.app/*)"
 fi

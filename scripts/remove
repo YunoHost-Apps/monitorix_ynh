@@ -18,7 +18,7 @@ load_vars
 #=================================================
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
-if ynh_exec_warn_less yunohost service status $app >/dev/null
+if ynh_exec_warn_less yunohost service status "$app" >/dev/null
 then
     ynh_script_progression --message="Removing $app service integration..." --weight=3
     yunohost service remove "$app"
@@ -48,11 +48,11 @@ for pool_dir_by_version in /etc/php/*; do
     fi
 done
 
-if ynh_psql_user_exists --user=$db_user; then
-    ynh_psql_drop_user $db_user
+if ynh_psql_user_exists --user="$db_user"; then
+    ynh_psql_drop_user "$db_user"
 fi
-if ynh_mysql_user_exists --user=$db_user; then
-    ynh_mysql_drop_user $db_user
+if ynh_mysql_user_exists --user="$db_user"; then
+    ynh_mysql_drop_user "$db_user"
 fi
 
 ynh_package_autopurge monitorix
