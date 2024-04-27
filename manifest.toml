@@ -7,7 +7,7 @@ name = "Monitorix"
 description.en = "A system monitoring tool"
 description.fr = "Un outil de monitoring système"
 
-version = "3.15.0~ynh5"
+version = "3.15.0~ynh6"
 
 maintainers = ["Josué Tille"]
 
