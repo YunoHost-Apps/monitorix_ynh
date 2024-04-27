@@ -24,6 +24,7 @@ if [ -n "$(ls -A "$data_dir")" ]; then
     mv -t "$old_data_dir_path" "$data_dir"/*
     app_data_dirs="$(echo /home/yunohost.app/*)"
 fi
+mkdir -p /var/log/"$app"
 
 ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
 
