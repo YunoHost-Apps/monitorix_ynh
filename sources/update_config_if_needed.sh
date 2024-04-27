@@ -76,13 +76,13 @@ if "$status_dirty"; then
     emailreports_yearly_to="$(ynh_app_setting_get --app="$app" --key=emailreports_yearly_to)"
 
     ynh_add_jinja_config --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
-    ynh_add_jinja_config --template=nginx_status.conf --destination "$nginx_status_conf"
+    ynh_add_jinja_config --template=nginx_status.conf --destination="$nginx_status_conf"
     configure_db
 
     if "$phpfpm_installed"; then
         config_php_fpm
     fi
-    ynh_systemd_action --service_name="$app" --action=restart --log_path 'systemd' --line_match ' - Ok, ready.'
+    ynh_systemd_action --service_name="$app" --action=restart --log_path='systemd' --line_match=' - Ok, ready.'
     ynh_systemd_action --service_name=nginx --action=reload
     save_vars_current_value
 fi
