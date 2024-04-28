@@ -12,17 +12,6 @@ source ../settings/scripts/experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 
-#=================================================
-# RESTORE THE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Restoring the dependencies..." --weight=1
-
-install_monitorix_package
-ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
-mkdir -p /var/log/new_"${app}"
-mv -t /var/log/new_"${app}" /var/log/monitorix*
-mv /var/log/new_"${app}" /var/log/"${app}"
-
 ynh_script_progression --message="Configuring databases access..."
 configure_db
 
@@ -32,15 +21,23 @@ configure_db
 ynh_script_progression --message="Restoring files" --weight=1
 
 ynh_restore
-mkdir -p /var/log/$app
-systemctl enable $app.service --quiet
+mkdir -p /var/log/"$app"
+systemctl enable "$app".service --quiet
 
 ynh_script_progression --message="Configuring php fpm access if needed..."
 if "$phpfpm_installed"; then
     config_php_fpm
 fi
 
-yunohost service add $app --description="Monitorix" --log="systemd"
+yunohost service add "$app" --description="Monitorix" --log="systemd"
+
+#=================================================
+# RESTORE THE DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Restoring the dependencies..." --weight=1
+
+install_monitorix_package
+ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
 
 #=================================================
 # GENERIC FINALIZATION
@@ -49,7 +46,7 @@ ynh_script_progression --message="Protecting directory..."
 
 set_permission
 
-ynh_use_logrotate --logfile "/var/log/$app"
+ynh_use_logrotate --logfile="/var/log/$app"
 
 #=================================================
 # GENERIC FINALIZATION
@@ -58,7 +55,7 @@ ynh_use_logrotate --logfile "/var/log/$app"
 #=================================================
 ynh_script_progression --message="Reloading NGINX web server and $app's service..." --weight=1
 
-ynh_systemd_action --service_name="$app" --action=start --log_path 'systemd' --line_match ' - Ok, ready.'
+ynh_systemd_action --service_name="$app" --action=start --log_path='systemd' --line_match=' - Ok, ready.'
 # when we change the value of 'listen [::1]:xxx;' nginx don't reload correctly the config, so force to restart to ensure that the new config are loaded
 ynh_systemd_action --service_name=nginx.service --action=restart
 ynh_systemd_action --service_name=nginx --action=reload

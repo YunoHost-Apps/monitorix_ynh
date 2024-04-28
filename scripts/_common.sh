@@ -79,7 +79,7 @@ load_vars() {
     readonly home_user_dirs="$(echo /home/* | home_dir_filter)"
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
-    readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1)"
+    readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1 | sed 's|-1|1000|g')"
     readonly ssh_port="$((grep ssh_port /etc/yunohost/settings.yml || echo 22) | cut -d: -f2 | xargs)"
     readonly port_infos="$(python3 <<EOF
 import yaml, socket
@@ -96,6 +96,8 @@ with open("/etc/yunohost/firewall.yml", "r") as f:
                       if str(port) not in hard_coded_ports]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
+    if services is None:
+        services = dict()
     port_map = dict()
     for key, value in services.items():
         if 'needs_exposed_ports' in value:
@@ -125,6 +127,8 @@ import yaml, socket
 hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
+    if services is None:
+        services = dict()
     results = ["%s|%s" % (k, v["description"] if "description" in v else k) for k, v in services.items()]
     print('\n'.join(results))
 EOF
@@ -145,7 +149,7 @@ EOF
 # Used by update_config_if_needed.sh hook
 save_vars_current_value() {
     for var in $var_list_to_manage; do
-        ynh_app_setting_set --app "$app" --key previous_$var --value "${!var}"
+        ynh_app_setting_set --app="$app" --key="previous_$var" --value="${!var}"
     done
 }
 
