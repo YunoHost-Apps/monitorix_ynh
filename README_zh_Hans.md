@@ -3,7 +3,7 @@
 请勿手动编辑。
 -->
 
-# YunoHost 的 Monitorix
+# YunoHost 上的 Monitorix
 
 [![集成程度](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![工作状态](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
 
@@ -21,7 +21,7 @@ Monitorix is a free, open source, lightweight system monitoring tool designed to
 It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**分发版本：** 3.15.0~ynh6
+**分发版本：** 3.15.0~ynh7
 
 **演示：** <https://www.fibranet.cat/monitorix/>
 
