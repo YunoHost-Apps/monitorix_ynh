@@ -7,8 +7,8 @@
 #=================================================
 
 source _common.sh
-source experimental_helper.sh
 source /usr/share/yunohost/helpers
+source experimental_helper.sh
 load_vars
 
 ensure_vars_set
@@ -34,8 +34,8 @@ ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --time
 ynh_script_progression --message="Adding configurations related to $app..." --weight=1
 
 mkdir -p /etc/monitorix
-ynh_add_jinja_config --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
-ynh_add_jinja_config --template=nginx_status.conf --destination="$nginx_status_conf"
+ynh_add_config --jinja --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
+ynh_add_config --jinja --template=nginx_status.conf --destination="$nginx_status_conf"
 
 ynh_add_nginx_config
 ynh_add_systemd_config

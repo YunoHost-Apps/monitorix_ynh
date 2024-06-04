@@ -14,7 +14,7 @@ ynh_abort_if_errors
 ynh_app_config_apply() {
     _ynh_app_config_apply
     load_vars
-    ynh_add_jinja_config --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
+    ynh_add_config --jinja --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
     save_vars_current_value
 }
 
