@@ -58,7 +58,4 @@ fi
 ynh_package_autopurge monitorix
 ynh_secure_remove --file="$install_dir"
 
-if [ "$YNH_APP_PURGE" -eq 1 ]; then
-fi
-
 ynh_script_progression --message="Removal of $app completed" --last
