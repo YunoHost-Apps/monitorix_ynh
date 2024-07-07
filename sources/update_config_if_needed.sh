@@ -9,9 +9,6 @@ YNH_HELPERS_VERSION=2
 pushd /etc/yunohost/apps/$app/conf
 source ../scripts/_common.sh
 source /usr/share/yunohost/helpers
-# Must load experimental helper after because we need the patched version of ynh_package_is_installed
-# To make the hook not too slow. It's mainly for optimization.
-source ../scripts/experimental_helper.sh
 load_vars
 
 status_dirty=false
