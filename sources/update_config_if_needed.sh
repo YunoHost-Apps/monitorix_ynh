@@ -4,6 +4,7 @@ set -eu
 
 app=__APP__
 YNH_APP_BASEDIR=/etc/yunohost/apps/"$app"
+YNH_HELPERS_VERSION=2
 
 pushd /etc/yunohost/apps/$app/conf
 source ../scripts/_common.sh
