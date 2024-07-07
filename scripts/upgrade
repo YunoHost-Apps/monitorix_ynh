@@ -8,7 +8,6 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
-source experimental_helper.sh
 load_vars
 
 upgrade_type="$(ynh_check_app_version_changed)"

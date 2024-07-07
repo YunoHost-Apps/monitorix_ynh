@@ -7,7 +7,6 @@
 #=================================================
 
 source _common.sh
-source experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 
