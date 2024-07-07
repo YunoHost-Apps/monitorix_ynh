@@ -5,7 +5,7 @@ EZ editatu eskuz.
 
 # Monitorix YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![Integrazio maila](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
 
 [![Instalatu Monitorix YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
