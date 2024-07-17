@@ -4,13 +4,11 @@ set -eu
 
 app=__APP__
 YNH_APP_BASEDIR=/etc/yunohost/apps/"$app"
+YNH_HELPERS_VERSION=2
 
 pushd /etc/yunohost/apps/$app/conf
 source ../scripts/_common.sh
 source /usr/share/yunohost/helpers
-# Must load experimental helper after because we need the patched version of ynh_package_is_installed
-# To make the hook not too slow. It's mainly for optimization.
-source ../scripts/experimental_helper.sh
 load_vars
 
 status_dirty=false
@@ -75,8 +73,8 @@ if "$status_dirty"; then
     emailreports_yearly_graphs="$(ynh_app_setting_get --app="$app" --key=emailreports_yearly_graphs)"
     emailreports_yearly_to="$(ynh_app_setting_get --app="$app" --key=emailreports_yearly_to)"
 
-    ynh_add_jinja_config --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
-    ynh_add_jinja_config --template=nginx_status.conf --destination="$nginx_status_conf"
+    ynh_add_config --jinja --template=monitorix.conf --destination="/etc/monitorix/monitorix.conf"
+    ynh_add_config --jinja --template=nginx_status.conf --destination="$nginx_status_conf"
     configure_db
 
     if "$phpfpm_installed"; then

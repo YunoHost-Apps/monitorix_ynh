@@ -5,7 +5,7 @@
 
 # YunoHost 上的 Monitorix
 
-[![集成程度](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![工作状态](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![集成程度](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![工作状态](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
 
 [![使用 YunoHost 安装 Monitorix](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 

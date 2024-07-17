@@ -45,7 +45,7 @@ load_vars() {
     # This function is called by the hook in install/upgrade/remove yunohost operation
     # We we need to ensure that this function the quickest as possible
     # Note that we don't use the yunohost command intentionally for optimization
-    if ynh_package_is_installed --package=mysql; then
+    if ynh_package_is_installed --package=mysql || ynh_package_is_installed --package=mariadb-server; then
         readonly mysql_installed=true
     else
         readonly mysql_installed=false
@@ -182,7 +182,7 @@ config_php_fpm() {
         pool_version=$(echo "$pool_dir_by_version" | cut -d/ -f4)
         pool_file="/etc/php/$pool_version/fpm/pool.d/${app}_status.conf"
         if ynh_package_is_installed --package="php$pool_version-fpm"; then
-            ynh_add_jinja_config --template=_php_status.conf --destination="$pool_file"
+            ynh_add_config --jinja --template=_php_status.conf --destination="$pool_file"
 
             chown root:root "$pool_file"
             chmod 444 "$pool_file"

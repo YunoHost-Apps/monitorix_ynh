@@ -7,7 +7,6 @@
 #=================================================
 
 source _common.sh
-source experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 
@@ -31,7 +30,7 @@ ynh_change_url_nginx_config
 # SPECIFIC MODIFICATIONS
 #=================================================
 ynh_script_progression --message="Updating a configuration file..." --weight=1
-ynh_add_jinja_config --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
+ynh_add_config --jinja --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
 
 #=================================================
 # GENERIC FINALISATION

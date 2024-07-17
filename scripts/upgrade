@@ -7,7 +7,6 @@
 #=================================================
 
 source _common.sh
-source experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 
@@ -76,8 +75,8 @@ fi
 #=================================================
 ynh_script_progression --message="Upgrading configurations related to $app..." --weight=1
 
-ynh_add_jinja_config --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
-ynh_add_jinja_config --template=nginx_status.conf --destination="$nginx_status_conf"
+ynh_add_config --jinja --template=monitorix.conf --destination=/etc/monitorix/monitorix.conf
+ynh_add_config --jinja --template=nginx_status.conf --destination="$nginx_status_conf"
 if "$phpfpm_installed"; then
     config_php_fpm
 fi
