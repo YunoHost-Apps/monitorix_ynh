@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 load_vars
@@ -17,33 +11,33 @@ load_vars
 #=================================================
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
-if ynh_exec_warn_less yunohost service status "$app" >/dev/null
+if ynh_hide_warnings yunohost service status "$app" >/dev/null
 then
-    ynh_script_progression --message="Removing $app service integration..." --weight=3
+    ynh_script_progression "Removing $app service integration..."
     yunohost service remove "$app"
 fi
 
 #=================================================
 # REMOVE SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Removing system configurations related to $app..." --weight=1
+ynh_script_progression "Removing system configurations related to $app..."
 
-ynh_systemd_action --service_name="$app" --action="stop" --log_path="systemd" --timeout=15
+ynh_systemctl --service="$app" --action="stop" --log_path="systemd" --timeout=15
 
-ynh_secure_remove --file="$nginx_status_conf"
-ynh_remove_nginx_config
+ynh_safe_rm "$nginx_status_conf"
+ynh_config_remove_nginx
 
-ynh_remove_systemd_config
+ynh_config_remove_systemd
 
 # Remove the app-specific logrotate config
-ynh_remove_logrotate
+ynh_config_remove_logrotate
 
 for pool_dir_by_version in /etc/php/*; do
     pool_version=$(echo "$pool_dir_by_version" | cut -d/ -f4)
     pool_file="/etc/php/$pool_version/fpm/pool.d/${app}_status.conf"
-    ynh_secure_remove --file="$pool_file"
-    if ynh_package_is_installed --package="php$pool_version-fpm"; then
-        ynh_systemd_action --service_name="php$pool_version"-fpm.service --action=reload
+    ynh_safe_rm "$pool_file"
+    if _ynh_apt_package_is_installed"php$pool_version-fpm"; then
+        ynh_systemctl --service="php$pool_version"-fpm.service --action=reload
     fi
 done
 
@@ -54,7 +48,7 @@ if ynh_mysql_user_exists --user="$db_user"; then
     ynh_mysql_drop_user "$db_user"
 fi
 
-ynh_package_autopurge monitorix
-ynh_secure_remove --file="$install_dir"
+_ynh_apt autoremove --purge monitorix
+ynh_safe_rm "$install_dir"
 
-ynh_script_progression --message="Removal of $app completed" --last
+ynh_script_progression "Removal of $app completed"

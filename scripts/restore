@@ -1,30 +1,24 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
 source ../settings/scripts/experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 
-ynh_script_progression --message="Configuring databases access..."
+ynh_script_progression "Configuring databases access..."
 configure_db
 
 #=================================================
 # RESTORE SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Restoring files" --weight=1
+ynh_script_progression "Restoring files"
 
-ynh_restore
+ynh_restore_everything
 mkdir -p /var/log/"$app"
 systemctl enable "$app".service --quiet
 
-ynh_script_progression --message="Configuring php fpm access if needed..."
+ynh_script_progression "Configuring php fpm access if needed..."
 if "$phpfpm_installed"; then
     config_php_fpm
 fi
@@ -34,34 +28,30 @@ yunohost service add "$app" --description="Monitorix" --log="systemd"
 #=================================================
 # RESTORE THE DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Restoring the dependencies..." --weight=1
+ynh_script_progression "Restoring the dependencies..."
 
 install_monitorix_package
-ynh_systemd_action --service_name="$app" --action=stop --log_path=systemd --timeout=15
+ynh_systemctl --service="$app" --action=stop --log_path=systemd --timeout=15
 
 #=================================================
-# GENERIC FINALIZATION
-#=================================================
-ynh_script_progression --message="Protecting directory..."
+ynh_script_progression "Protecting directory..."
 
 set_permission
 
-ynh_use_logrotate --logfile="/var/log/$app"
+ynh_config_add_logrotate "/var/log/$app"
 
-#=================================================
-# GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX AND PHP-FPM OR THE APP SERVICE
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server and $app's service..." --weight=1
+ynh_script_progression "Reloading NGINX web server and $app's service..."
 
-ynh_systemd_action --service_name="$app" --action=start --log_path='systemd' --line_match=' - Ok, ready.'
+ynh_systemctl --service="$app" --action=start --log_path='systemd' --wait_until=' - Ok, ready.'
 # when we change the value of 'listen [::1]:xxx;' nginx don't reload correctly the config, so force to restart to ensure that the new config are loaded
-ynh_systemd_action --service_name=nginx.service --action=restart
-ynh_systemd_action --service_name=nginx --action=reload
+ynh_systemctl --service=nginx.service --action=restart
+ynh_systemctl --service=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Restoration completed for $app" --last
+ynh_script_progression "Restoration completed for $app"
