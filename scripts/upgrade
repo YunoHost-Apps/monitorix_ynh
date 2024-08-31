@@ -34,14 +34,10 @@ ynh_systemctl --service="$app" --action=stop
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
-if ynh_app_upstream_version_changed
-then
-    ynh_script_progression "Upgrading source files..."
+ynh_script_progression "Upgrading source files..."
 
-    # Download, check integrity, uncompress and patch the source from manifest.toml
-    install_monitorix_package
-fi
+# Download, check integrity, uncompress and patch the source from manifest.toml
+install_monitorix_package
 
 ynh_systemctl --service="$app" --action=stop --log_path=systemd --timeout=15
 

@@ -20,7 +20,7 @@ code = "https://github.com/mikaku/Monitorix"
 cpe = "cpe:2.3:a:fibranet:monitorix"
 
 [integration]
-yunohost = ">= 11.2.18"
+yunohost = ">= 11.2.29"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
@@ -54,7 +54,6 @@ ram.runtime = "50M"
     [resources.install_dir]
     group = "www-data:r-x"
     owner = "__APP__:rwx"
-    group = "www-data:rx"
 
     [resources.data_dir]
 
