@@ -36,7 +36,7 @@ for pool_dir_by_version in /etc/php/*; do
     pool_version=$(echo "$pool_dir_by_version" | cut -d/ -f4)
     pool_file="/etc/php/$pool_version/fpm/pool.d/${app}_status.conf"
     ynh_safe_rm "$pool_file"
-    if _ynh_apt_package_is_installed"php$pool_version-fpm"; then
+    if _ynh_apt_package_is_installed "php$pool_version-fpm"; then
         ynh_systemctl --service="php$pool_version"-fpm.service --action=reload
     fi
 done
