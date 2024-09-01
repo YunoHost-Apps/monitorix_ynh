@@ -80,7 +80,7 @@ load_vars() {
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
     readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1 | sed 's|-1|1000|g')"
-    readonly ssh_port="$((grep ssh_port /etc/yunohost/settings.yml || echo 22) | cut -d: -f2 | xargs)"
+    readonly ssh_port="$((([ -e /etc/yunohost/settings.yml ] && grep ssh_port /etc/yunohost/settings.yml) || echo 22) | cut -d: -f2 | xargs)"
     readonly port_infos="$(python3 <<EOF
 import yaml, socket
 hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
@@ -134,7 +134,7 @@ with open("/etc/yunohost/services.yml", "r") as f:
 EOF
 )"
 
-    if compgen -G /etc/php/*/fpm/pool.d; then
+    if compgen -G /etc/php/*/fpm/pool.d/*; then
         # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
         readonly php_pools_infos="$(grep -E '^\[.*\]' \
                 --exclude=/etc/php/*/fpm/pool.d/"$app"_status.conf \

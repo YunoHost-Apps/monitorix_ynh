@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source ../settings/scripts/_common.sh
-source ../settings/scripts/experimental_helper.sh
 source /usr/share/yunohost/helpers
 load_vars
 

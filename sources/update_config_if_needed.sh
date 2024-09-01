@@ -5,6 +5,7 @@ set -eu
 app=__APP__
 YNH_APP_BASEDIR=/etc/yunohost/apps/"$app"
 YNH_HELPERS_VERSION=2.1
+YNH_APP_ACTION="$1"
 
 pushd /etc/yunohost/apps/$app/conf
 source ../scripts/_common.sh
@@ -80,7 +81,7 @@ if "$status_dirty"; then
     if "$phpfpm_installed"; then
         config_php_fpm
     fi
-    ynh_systemctl --service_name="$app" --action=restart --log_path='systemd' --line_match=' - Ok, ready.'
-    ynh_systemctl --service_name=nginx --action=reload
+    ynh_systemctl --service="$app" --action=restart --log_path=systemd --wait_until=' - Ok, ready.'
+    ynh_systemctl --service=nginx --action=reload
     save_vars_current_value
 fi

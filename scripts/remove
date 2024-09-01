@@ -41,11 +41,11 @@ for pool_dir_by_version in /etc/php/*; do
     fi
 done
 
-if ynh_psql_user_exists --user="$db_user"; then
-    ynh_psql_drop_user "$db_user"
-fi
-if ynh_mysql_user_exists --user="$db_user"; then
+if $mysql_installed && ynh_mysql_user_exists --user="$db_user"; then
     ynh_mysql_drop_user "$db_user"
+fi
+if $postgresql_installed && ynh_psql_user_exists --user="$db_user"; then
+    ynh_psql_drop_user "$db_user"
 fi
 
 _ynh_apt autoremove --purge monitorix
