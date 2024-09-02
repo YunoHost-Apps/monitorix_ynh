@@ -274,7 +274,7 @@ set_permission() {
     chmod u=rwx,g=rx,o= "$data_dir"
     chown "$app":www-data "$data_dir"
 
-    chmod u=rwx,g=rx,o= "$data_dir"/*.rrd || true
+    chmod u=rw,g=r,o= "$data_dir"/*.rrd || true
     chown "$app":root "$data_dir"/*.rrd || true
     find "$data_dir"/{reports,usage} \(   \! -perm -o= \
                                        -o \! -user "$app" \
