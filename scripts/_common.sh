@@ -169,10 +169,10 @@ configure_db() {
     # Here the idea is to monitor available database
     # So if mysql is installed we monitor it but mysql could also not be installed and in this case don't need to monitor it
     # For postgresql it's the same case
-    if $mysql_installed && ! ynh_mysql_user_exists --user="$db_user"; then
+    if $mysql_installed && ! ynh_mysql_user_exists "$db_user"; then
         ynh_mysql_create_user "$db_user" "$db_pwd"
     fi
-    if $postgresql_installed && ! ynh_psql_user_exists --user="$db_user"; then
+    if $postgresql_installed && ! ynh_psql_user_exists "$db_user"; then
         ynh_psql_create_user "$db_user" "$db_pwd"
     fi
 }
