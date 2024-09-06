@@ -1,18 +1,18 @@
 ### Remove
 
-Due of the backup core only feature the data directory in `/home/yunohost.app/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
+Due of the "backup core only" feature (`BACKUP_CORE_ONLY`), the data directory in `/home/yunohost.app/monitorix` **is not removed**. It must be manually deleted to purge user data from the app.
 
 ### More sensor
 
-If you want to see the temperature of some sensor you can install the `lm-sensor` packet. For disk temperature you can instal the `hddtemp` packet.
+If you want to see the temperature of some sensor you can install the `lm-sensor` package. For disk temperature you can install the `hddtemp` package.
 
 ### Custom config
 
-If you want do custom the monitorix config for more personnal information you can add a file in `/etc/monitorix/conf.d/`. This config file will be overwritte the original config in `/etc/monitorix/monitorix.conf`.
+If you want customize the monitorix config for more local preferences, you can add a file in `/etc/monitorix/conf.d/`. This config file will override the original config settings in `/etc/monitorix/monitorix.conf`.
 
 You will have a full complete documentation for monitorix config here : https://www.monitorix.org/documentation.html
 
-By example you can extends the basic config by this :
+For example you can extend the basic config by this :
 
 ```xml
 <graph_enable>
@@ -98,5 +98,5 @@ By example you can extends the basic config by this :
 In this config :
 
 - We get the lmsensor sensor data.
-- We get some sensors data not accessible with lmsensor (with gensens)
-- We check the disk health and send an email if any error happens. For that you need to make some script. An example is available in `/usr/share/doc/monitorix/monitorix-alert.sh`.
+- We get some sensors data which are not accessible with lmsensor (with gensens)
+- We check the disk health and send an email if any error happens. For that, you need to make some script. An example is available in `/usr/share/doc/monitorix/monitorix-alert.sh`.
