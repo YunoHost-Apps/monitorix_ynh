@@ -7,7 +7,7 @@ No se debe editar a mano.
 
 [![Nivel de integración](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Estado funcional](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Estado En Mantención](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
 
-[![Instalar Monitorix con Yunohost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
+[![Instalar Monitorix con Yunhost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
 *[Leer este README en otros idiomas.](./ALL_README.md)*
 
