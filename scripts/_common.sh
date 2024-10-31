@@ -16,7 +16,7 @@ readonly var_list_to_manage='mysql_installed postgresql_installed memcached_inst
 installed_php_fpm_filter() {
     while read -r item; do
         local version=${item%,*}
-        if ynh_package_is_installed --package=php"$version"-fpm; then
+        if _ynh_apt_package_is_installed php"$version"-fpm; then
             echo "$item"
         fi
     done
@@ -45,27 +45,27 @@ load_vars() {
     # This function is called by the hook in install/upgrade/remove yunohost operation
     # We we need to ensure that this function the quickest as possible
     # Note that we don't use the yunohost command intentionally for optimization
-    if ynh_package_is_installed --package=mysql || ynh_package_is_installed --package=mariadb-server; then
+    if _ynh_apt_package_is_installed mysql || _ynh_apt_package_is_installed mariadb-server; then
         readonly mysql_installed=true
     else
         readonly mysql_installed=false
     fi
-    if ynh_package_is_installed --package=postgresql; then
+    if _ynh_apt_package_is_installed postgresql; then
         readonly postgresql_installed=true
     else
         readonly postgresql_installed=false
     fi
-    if ynh_package_is_installed --package=memcached; then
+    if _ynh_apt_package_is_installed memcached; then
         readonly memcached_installed=true
     else
         readonly memcached_installed=false
     fi
-    if ynh_package_is_installed --package=redis-server; then
+    if _ynh_apt_package_is_installed redis-server; then
         readonly redis_installed=true
     else
         readonly redis_installed=false
     fi
-    if ynh_package_is_installed --package='php*-fpm'; then
+    if _ynh_apt_package_is_installed 'php*-fpm'; then
         readonly phpfpm_installed=true
     else
         readonly phpfpm_installed=false
@@ -80,7 +80,7 @@ load_vars() {
     readonly net_gateway="$(ip --json route show default | jq -r '.[0].dev')"
     readonly net_interface_list="$(ip --json link show | jq -r '.[].ifname | select(. != "lo")' | interface_speed_map)"
     readonly net_max_speed="$(cat /sys/class/net/*/speed  2>/dev/null | sort | tail -n1 | sed 's|-1|1000|g')"
-    readonly ssh_port="$((grep ssh_port /etc/yunohost/settings.yml || echo 22) | cut -d: -f2 | xargs)"
+    readonly ssh_port="$((([ -e /etc/yunohost/settings.yml ] && grep ssh_port /etc/yunohost/settings.yml) || echo 22) | cut -d: -f2 | xargs)"
     readonly port_infos="$(python3 <<EOF
 import yaml, socket
 hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
@@ -134,7 +134,7 @@ with open("/etc/yunohost/services.yml", "r") as f:
 EOF
 )"
 
-    if compgen -G /etc/php/*/fpm/pool.d; then
+    if compgen -G /etc/php/*/fpm/pool.d/*; then
         # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
         readonly php_pools_infos="$(grep -E '^\[.*\]' \
                 --exclude=/etc/php/*/fpm/pool.d/"$app"_status.conf \
@@ -149,7 +149,7 @@ EOF
 # Used by update_config_if_needed.sh hook
 save_vars_current_value() {
     for var in $var_list_to_manage; do
-        ynh_app_setting_set --app="$app" --key="previous_$var" --value="${!var}"
+        ynh_app_setting_set --key="previous_$var" --value="${!var}"
     done
 }
 
@@ -161,7 +161,7 @@ install_monitorix_package() {
     ynh_setup_source --dest_dir="$tempdir" --source_id="main"
 
     # Install the package
-    ynh_package_install "$tempdir/monitorix.deb"
+    _ynh_apt_install "$tempdir/monitorix.deb"
     cp -r /var/lib/monitorix/* "$data_dir"/
 }
 
@@ -169,10 +169,10 @@ configure_db() {
     # Here the idea is to monitor available database
     # So if mysql is installed we monitor it but mysql could also not be installed and in this case don't need to monitor it
     # For postgresql it's the same case
-    if $mysql_installed && ! ynh_mysql_user_exists --user="$db_user"; then
+    if $mysql_installed && ! ynh_mysql_user_exists "$db_user"; then
         ynh_mysql_create_user "$db_user" "$db_pwd"
     fi
-    if $postgresql_installed && ! ynh_psql_user_exists --user="$db_user"; then
+    if $postgresql_installed && ! ynh_psql_user_exists "$db_user"; then
         ynh_psql_create_user "$db_user" "$db_pwd"
     fi
 }
@@ -181,32 +181,32 @@ config_php_fpm() {
     for pool_dir_by_version in /etc/php/*; do
         pool_version=$(echo "$pool_dir_by_version" | cut -d/ -f4)
         pool_file="/etc/php/$pool_version/fpm/pool.d/${app}_status.conf"
-        if ynh_package_is_installed --package="php$pool_version-fpm"; then
-            ynh_add_config --jinja --template=_php_status.conf --destination="$pool_file"
+        if _ynh_apt_package_is_installed "php$pool_version-fpm"; then
+            ynh_config_add --jinja --template=_php_status.conf --destination="$pool_file"
 
             chown root:root "$pool_file"
             chmod 444 "$pool_file"
-            ynh_systemd_action --service_name="php$pool_version"-fpm.service --action=reload
+            ynh_systemctl --service="php$pool_version"-fpm.service --action=reload
         else
             if [ -e "$pool_file" ]; then
-                ynh_secure_remove --file="$pool_file"
+                ynh_safe_rm "$pool_file"
             fi
         fi
     done
 }
 
 configure_hooks() {
-    ynh_replace_string --match_string=__APP__ --replace_string="$app" --target_file=../hooks/post_iptable_rules
-    ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_install
-    ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_remove
-    ynh_replace_string --match_string=__INSTALL_DIR__ --replace_string="$install_dir" --target_file=../hooks/post_app_upgrade
+    ynh_replace --match=__APP__ --replace="$app" --file=../hooks/post_iptable_rules
+    ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_install
+    ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_remove
+    ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_upgrade
 
     cp ../sources/update_config_if_needed.sh "$install_dir"/
-    ynh_replace_string --match_string=__APP__ --replace_string="$app" --target_file="$install_dir"/update_config_if_needed.sh
+    ynh_replace --match=__APP__ --replace="$app" --file="$install_dir"/update_config_if_needed.sh
 }
 
 configure_alerts_email() {
-    ynh_add_config --template=monitorix-alert.sh --destination="$install_dir"/monitorix-alert.sh
+    ynh_config_add --template=monitorix-alert.sh --destination="$install_dir"/monitorix-alert.sh
     for alias_file in system.loadavg-alert.sh \
                       fs.loadavg-alert.sh \
                       mail.mqueued-alert.sh \
@@ -215,7 +215,7 @@ configure_alerts_email() {
         alias_path="$install_dir/$alias_file"
         if [ ! -h "$alias_path" ]; then
             if [ -e "$alias_path" ]; then
-                ynh_secure_remove --file="$alias_path"
+                ynh_safe_rm "$alias_path"
             fi
             ln -s "$install_dir/monitorix-alert.sh" "$install_dir/$alias_file"
         fi
@@ -223,155 +223,41 @@ configure_alerts_email() {
 }
 
 ensure_vars_set() {
-    if [ -z "${db_pwd:-}" ]; then
-        db_pwd="$(ynh_string_random 12)"
-        ynh_app_setting_set --app="$app" --key=db_pwd --value="$db_pwd"
-    fi
-
-    if [ -z "${alerts_email:-}" ]; then
-        alerts_email="admins@$domain"
-        ynh_app_setting_set --app="$app" --key=alerts_email --value="$alerts_email"
-    fi
-    if [ -z "${enable_hourly_view:-}" ]; then
-        enable_hourly_view=n
-        ynh_app_setting_set --app="$app" --key=enable_hourly_view --value="$enable_hourly_view"
-    fi
-    if [ -z "${image_format:-}" ]; then
-        image_format=svg
-        ynh_app_setting_set --app="$app" --key=image_format --value="$image_format"
-    fi
-    if [ -z "${theme_color:-}" ]; then
-        theme_color=black
-        ynh_app_setting_set --app="$app" --key=theme_color --value="$theme_color"
-    fi
-    if [ -z "${max_historic_years:-}" ]; then
-        max_historic_years=5
-        ynh_app_setting_set --app="$app" --key=max_historic_years --value="$max_historic_years"
-    fi
-    if [ -z "${process_priority:-}" ]; then
-        process_priority=0
-        ynh_app_setting_set --app="$app" --key=process_priority --value="$process_priority"
-    fi
-
-    if [ -z "${system_alerts_loadavg_enabled:-}" ]; then
-        system_alerts_loadavg_enabled=n
-        ynh_app_setting_set --app="$app" --key=system_alerts_loadavg_enabled --value="$system_alerts_loadavg_enabled"
-    fi
-    if [ -z "${system_alerts_loadavg_timeintvl:-}" ]; then
-        system_alerts_loadavg_timeintvl=3600
-        ynh_app_setting_set --app="$app" --key=system_alerts_loadavg_timeintvl --value="$system_alerts_loadavg_timeintvl"
-    fi
-    if [ -z "${system_alerts_loadavg_threshold:-}" ]; then
-        system_alerts_loadavg_threshold=5.0
-        ynh_app_setting_set --app="$app" --key=system_alerts_loadavg_threshold --value="$system_alerts_loadavg_threshold"
-    fi
-
-    if [ -z "${disk_alerts_loadavg_enabled:-}" ]; then
-        disk_alerts_loadavg_enabled=false
-        ynh_app_setting_set --app="$app" --key=disk_alerts_loadavg_enabled --value="$disk_alerts_loadavg_enabled"
-    fi
-    if [ -z "${disk_alerts_loadavg_timeintvl:-}" ]; then
-        disk_alerts_loadavg_timeintvl=3600
-        ynh_app_setting_set --app="$app" --key=disk_alerts_loadavg_timeintvl --value="$disk_alerts_loadavg_timeintvl"
-    fi
-    if [ -z "${disk_alerts_loadavg_threshold:-}" ]; then
-        disk_alerts_loadavg_threshold=98
-        ynh_app_setting_set --app="$app" --key=disk_alerts_loadavg_threshold --value="$disk_alerts_loadavg_threshold"
-    fi
-
-    if [ -z "${mail_delvd_enabled:-}" ]; then
-        mail_delvd_enabled=n
-        ynh_app_setting_set --app="$app" --key=mail_delvd_enabled --value="$mail_delvd_enabled"
-    fi
-    if [ -z "${mail_delvd_timeintvl:-}" ]; then
-        mail_delvd_timeintvl=60
-        ynh_app_setting_set --app="$app" --key=mail_delvd_timeintvl --value="$mail_delvd_timeintvl"
-    fi
-    if [ -z "${mail_delvd_threshold:-}" ]; then
-        mail_delvd_threshold=100
-        ynh_app_setting_set --app="$app" --key=mail_delvd_threshold --value="$mail_delvd_threshold"
-    fi
-    if [ -z "${mail_mqueued_enabled:-}" ]; then
-        mail_mqueued_enabled=n
-        ynh_app_setting_set --app="$app" --key=mail_mqueued_enabled --value="$mail_mqueued_enabled"
-    fi
-    if [ -z "${mail_mqueued_timeintvl:-}" ]; then
-        mail_mqueued_timeintvl=3600
-        ynh_app_setting_set --app="$app" --key=mail_mqueued_timeintvl --value="$mail_mqueued_timeintvl"
-    fi
-    if [ -z "${mail_mqueued_threshold:-}" ]; then
-        mail_mqueued_threshold=100
-        ynh_app_setting_set --app="$app" --key=mail_mqueued_threshold --value="$mail_mqueued_threshold"
-    fi
-
-    if [ -z "${emailreports_enabled:-}" ]; then
-        emailreports_enabled=n
-        ynh_app_setting_set --app="$app" --key=emailreports_enabled --value="$emailreports_enabled"
-    fi
-    if [ -z "${emailreports_subject_prefix:-}" ]; then
-        emailreports_subject_prefix='Monitorix:'
-        ynh_app_setting_set --app="$app" --key=emailreports_subject_prefix --value="$emailreports_subject_prefix"
-    fi
-    if [ -z "${emailreports_hour:-}" ]; then
-        emailreports_hour=0
-        ynh_app_setting_set --app="$app" --key=emailreports_hour --value="$emailreports_hour"
-    fi
-    if [ -z "${emailreports_minute:-}" ]; then
-        emailreports_minute=0
-        ynh_app_setting_set --app="$app" --key=emailreports_minute --value="$emailreports_minute"
-    fi
-
-    if [ -z "${emailreports_daily_enabled:-}" ]; then
-        emailreports_daily_enabled=n
-        ynh_app_setting_set --app="$app" --key=emailreports_daily_enabled --value="$emailreports_daily_enabled"
-    fi
-    if [ -z "${emailreports_daily_graphs:-}" ]; then
-        emailreports_daily_graphs='system,fs'
-        ynh_app_setting_set --app="$app" --key=emailreports_daily_graphs --value="$emailreports_daily_graphs"
-    fi
-    if [ -z "${emailreports_daily_to:-}" ]; then
-        emailreports_daily_to="admins@$domain"
-        ynh_app_setting_set --app="$app" --key=emailreports_daily_to --value="$emailreports_daily_to"
-    fi
-
-    if [ -z "${emailreports_weekly_enabled:-}" ]; then
-        emailreports_weekly_enabled=n
-        ynh_app_setting_set --app="$app" --key=emailreports_weekly_enabled --value="$emailreports_weekly_enabled"
-    fi
-    if [ -z "${emailreports_weekly_graphs:-}" ]; then
-        emailreports_weekly_graphs='system,fs'
-        ynh_app_setting_set --app="$app" --key=emailreports_weekly_graphs --value="$emailreports_weekly_graphs"
-    fi
-    if [ -z "${emailreports_weekly_to:-}" ]; then
-        emailreports_weekly_to="admins@$domain"
-        ynh_app_setting_set --app="$app" --key=emailreports_weekly_to --value="$emailreports_weekly_to"
-    fi
-
-    if [ -z "${emailreports_monthly_enabled:-}" ]; then
-        emailreports_monthly_enabled=n
-        ynh_app_setting_set --app="$app" --key=emailreports_monthly_enabled --value="$emailreports_monthly_enabled"
-    fi
-    if [ -z "${emailreports_monthly_graphs:-}" ]; then
-        emailreports_monthly_graphs='system,fs'
-        ynh_app_setting_set --app="$app" --key=emailreports_monthly_graphs --value="$emailreports_monthly_graphs"
-    fi
-    if [ -z "${emailreports_monthly_to:-}" ]; then
-        emailreports_monthly_to="admins@$domain"
-        ynh_app_setting_set --app="$app" --key=emailreports_monthly_to --value="$emailreports_monthly_to"
-    fi
-
-    if [ -z "${emailreports_yearly_enabled:-}" ]; then
-        emailreports_yearly_enabled=n
-        ynh_app_setting_set --app="$app" --key=emailreports_yearly_enabled --value="$emailreports_yearly_enabled"
-    fi
-    if [ -z "${emailreports_yearly_graphs:-}" ]; then
-        emailreports_yearly_graphs='system,fs'
-        ynh_app_setting_set --app="$app" --key=emailreports_yearly_graphs --value="$emailreports_yearly_graphs"
-    fi
-    if [ -z "${emailreports_yearly_to:-}" ]; then
-        emailreports_yearly_to="admins@$domain"
-        ynh_app_setting_set --app="$app" --key=emailreports_yearly_to --value="$emailreports_yearly_to"
-    fi
+    ynh_app_setting_set_default --key=db_pwd --value="$(ynh_string_random --length=12)"
+    ynh_app_setting_set_default --key=alerts_email --value="admins@$domain"
+    ynh_app_setting_set_default --key=enable_hourly_view --value=n
+    ynh_app_setting_set_default --key=image_format --value=svg
+    ynh_app_setting_set_default --key=theme_color --value=black
+    ynh_app_setting_set_default --key=max_historic_years --value=5
+    ynh_app_setting_set_default --key=process_priority --value=0
+    ynh_app_setting_set_default --key=system_alerts_loadavg_enabled --value=n
+    ynh_app_setting_set_default --key=system_alerts_loadavg_timeintvl --value=3600
+    ynh_app_setting_set_default --key=system_alerts_loadavg_threshold --value=5.0
+    ynh_app_setting_set_default --key=disk_alerts_loadavg_enabled --value=false
+    ynh_app_setting_set_default --key=disk_alerts_loadavg_timeintvl --value=3600
+    ynh_app_setting_set_default --key=disk_alerts_loadavg_threshold --value=98
+    ynh_app_setting_set_default --key=mail_delvd_enabled --value=n
+    ynh_app_setting_set_default --key=mail_delvd_timeintvl --value=60
+    ynh_app_setting_set_default --key=mail_delvd_threshold --value=100
+    ynh_app_setting_set_default --key=mail_mqueued_enabled --value=n
+    ynh_app_setting_set_default --key=mail_mqueued_timeintvl --value=3600
+    ynh_app_setting_set_default --key=mail_mqueued_threshold --value=100
+    ynh_app_setting_set_default --key=emailreports_enabled --value=n
+    ynh_app_setting_set_default --key=emailreports_subject_prefix --value='Monitorix:'
+    ynh_app_setting_set_default --key=emailreports_hour --value=0
+    ynh_app_setting_set_default --key=emailreports_minute --value=0
+    ynh_app_setting_set_default --key=emailreports_daily_enabled --value=n
+    ynh_app_setting_set_default --key=emailreports_daily_graphs --value='system,fs'
+    ynh_app_setting_set_default --key=emailreports_daily_to --value="admins@$domain"
+    ynh_app_setting_set_default --key=emailreports_weekly_enabled --value=n
+    ynh_app_setting_set_default --key=emailreports_weekly_graphs --value='system,fs'
+    ynh_app_setting_set_default --key=emailreports_weekly_to --value="admins@$domain"
+    ynh_app_setting_set_default --key=emailreports_monthly_enabled --value=n
+    ynh_app_setting_set_default --key=emailreports_monthly_graphs --value='system,fs'
+    ynh_app_setting_set_default --key=emailreports_monthly_to --value="admins@$domain"
+    ynh_app_setting_set_default --key=emailreports_yearly_enabled --value=n
+    ynh_app_setting_set_default --key=emailreports_yearly_graphs --value='system,fs'
+    ynh_app_setting_set_default --key=emailreports_yearly_to --value="admins@$domain"
 }
 
 set_permission() {
@@ -388,7 +274,7 @@ set_permission() {
     chmod u=rwx,g=rx,o= "$data_dir"
     chown "$app":www-data "$data_dir"
 
-    chmod u=rwx,g=rx,o= "$data_dir"/*.rrd || true
+    chmod u=rw,g=r,o= "$data_dir"/*.rrd || true
     chown "$app":root "$data_dir"/*.rrd || true
     find "$data_dir"/{reports,usage} \(   \! -perm -o= \
                                        -o \! -user "$app" \
