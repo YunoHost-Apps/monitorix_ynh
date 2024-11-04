@@ -7,7 +7,7 @@ name = "Monitorix"
 description.en = "A system monitoring tool"
 description.fr = "Un outil de monitoring système"
 
-version = "3.15.0~ynh8"
+version = "3.15.0~ynh9"
 
 maintainers = ["Josué Tille"]
 
@@ -20,7 +20,8 @@ code = "https://github.com/mikaku/Monitorix"
 cpe = "cpe:2.3:a:fibranet:monitorix"
 
 [integration]
-yunohost = ">= 11.2.20"
+yunohost = ">= 11.2.30"
+helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 ldap = "not_relevant"
@@ -51,9 +52,8 @@ ram.runtime = "50M"
     [resources.system_user]
 
     [resources.install_dir]
-    dir = "/opt/yunohost/__APP__"
+    group = "www-data:r-x"
     owner = "__APP__:rwx"
-    group = "www-data:rx"
 
     [resources.data_dir]
 
