@@ -65,7 +65,8 @@ load_vars() {
     else
         readonly redis_installed=false
     fi
-    if _ynh_apt_package_is_installed 'php*-fpm'; then
+    if dpkg-query --show --showformat='${db:Status-Status}\n' "php*-fpm" 2> /dev/null \
+        | grep --quiet "^installed$" &> /dev/null; then
         readonly phpfpm_installed=true
     else
         readonly phpfpm_installed=false
