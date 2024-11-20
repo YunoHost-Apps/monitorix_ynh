@@ -71,8 +71,10 @@ name.en = "Monitorix configuration"
 
         [config.system.system_alerts_loadavg_threshold]
         ask.en = "Load average threshold"
-        type = "range"
-        help = "This is the value that needs to be reached or exceeded within the specified time period in loadavg_timeintvl to trigger the mechanism for a particular action, which in this case is the execution of an external alert script.\n\nThe value of this option is compared against the last 15 minutes of CPU load average."
+        type = "string"
+        pattern.regexp = '^\d+\.\d$'
+        pattern.error = 'Should be a float number. By example "5.1"'
+        help = "This is the value that needs to be reached or exceeded within the specified time period in loadavg_timeintvl to trigger the mechanism for a particular action, which in this case is the execution of an external alert script.\n\nThe value of this option is compared against the last 15 minutes of CPU load average. By example '5.1'"
 
     [config.disk]
     name = "Disk usage"
