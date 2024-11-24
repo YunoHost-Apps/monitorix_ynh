@@ -5,7 +5,9 @@ Hij mag NIET handmatig aangepast worden.
 
 # Monitorix voor Yunohost
 
-[![Integratieniveau](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Mate van functioneren](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Onderhoudsstatus](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![Integratieniveau](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Mate van functioneren](https://apps.yunohost.org/badge/state/monitorix)
+![Onderhoudsstatus](https://apps.yunohost.org/badge/maintained/monitorix)
 
 [![Monitorix met Yunohost installeren](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 

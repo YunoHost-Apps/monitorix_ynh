@@ -5,7 +5,9 @@ NON debe editarse manualmente.
 
 # Monitorix para YunoHost
 
-[![Nivel de integración](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Estado de funcionamento](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Estado de mantemento](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![Nivel de integración](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Estado de funcionamento](https://apps.yunohost.org/badge/state/monitorix)
+![Estado de mantemento](https://apps.yunohost.org/badge/maintained/monitorix)
 
 [![Instalar Monitorix con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
