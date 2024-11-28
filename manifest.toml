@@ -43,7 +43,7 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://www.monitorix.org/monitorix_3.15.0-izzy1_all.deb"
+    url = "https://www.monitorix.org/old-versions/monitorix_3.15.0-izzy1_all.deb"
     sha256 = "0d960b9433ecbaba38d9befe27163644886fb5a466d44f5380576ca975b9d8e4"
     rename = "monitorix.deb"
     extract = false
