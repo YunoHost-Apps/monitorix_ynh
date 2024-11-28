@@ -5,7 +5,9 @@
 
 # Monitorix для YunoHost
 
-[![Уровень интеграции](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Состояние работы](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Состояние сопровождения](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Состояние работы](https://apps.yunohost.org/badge/state/monitorix)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/monitorix)
 
 [![Установите Monitorix с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 

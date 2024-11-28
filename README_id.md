@@ -5,7 +5,9 @@ Ini TIDAK boleh diedit dengan tangan.
 
 # Monitorix untuk YunoHost
 
-[![Tingkat integrasi](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/) ![Status kerja](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![Status pemeliharaan](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Status kerja](https://apps.yunohost.org/badge/state/monitorix)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/monitorix)
 
 [![Pasang Monitorix dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
