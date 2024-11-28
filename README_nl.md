@@ -1,35 +1,35 @@
 <!--
-NOTA: Este README foi creado automáticamente por <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
-NON debe editarse manualmente.
+NB: Deze README is automatisch gegenereerd door <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
+Hij mag NIET handmatig aangepast worden.
 -->
 
-# Monitorix para YunoHost
+# Monitorix voor Yunohost
 
-[![Nivel de integración](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
-![Estado de funcionamento](https://apps.yunohost.org/badge/state/monitorix)
-![Estado de mantemento](https://apps.yunohost.org/badge/maintained/monitorix)
+[![Integratieniveau](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Mate van functioneren](https://apps.yunohost.org/badge/state/monitorix)
+![Onderhoudsstatus](https://apps.yunohost.org/badge/maintained/monitorix)
 
-[![Instalar Monitorix con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
+[![Monitorix met Yunohost installeren](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
-*[Le este README en outros idiomas.](./ALL_README.md)*
+*[Deze README in een andere taal lezen.](./ALL_README.md)*
 
-> *Este paquete permíteche instalar Monitorix de xeito rápido e doado nun servidor YunoHost.*  
-> *Se non usas YunoHost, le a [documentación](https://yunohost.org/install) para saber como instalalo.*
+> *Met dit pakket kun je Monitorix snel en eenvoudig op een YunoHost-server installeren.*  
+> *Als je nog geen YunoHost hebt, lees dan [de installatiehandleiding](https://yunohost.org/install), om te zien hoe je 'm installeert.*
 
-## Vista xeral
+## Overzicht
 
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Versión proporcionada:** 3.15.0~ynh3
+**Geleverde versie:** 3.15.0~ynh3
 
 **Demo:** <https://www.fibranet.cat/monitorix/>
 
-## Capturas de pantalla
+## Schermafdrukken
 
-![Captura de pantalla de Monitorix](./doc/screenshots/mail.png)
+![Schermafdrukken van Monitorix](./doc/screenshots/mail.png)
 
-## Avisos / información importante
+## Uitsluitingen / belangrijke informatie
 
 ### Upgrade
 
@@ -281,24 +281,24 @@ In this config we have :
 - We check some process.
 - We send every day, week, month and year a rapport.
 
-## Documentación e recursos
+## Documentatie en bronnen
 
-- Web oficial da app: <http://monitorix.org>
-- Documentación oficial para admin: <https://www.monitorix.org/documentation.html>
-- Repositorio de orixe do código: <https://github.com/mikaku/Monitorix>
-- Tenda YunoHost: <https://apps.yunohost.org/app/monitorix>
-- Informar dun problema: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
+- Officiele website van de app: <http://monitorix.org>
+- Officiele beheerdersdocumentatie: <https://www.monitorix.org/documentation.html>
+- Upstream app codedepot: <https://github.com/mikaku/Monitorix>
+- YunoHost-store: <https://apps.yunohost.org/app/monitorix>
+- Meld een bug: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
 
-## Info de desenvolvemento
+## Ontwikkelaarsinformatie
 
-Envía a túa colaboración á [rama `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
+Stuur je pull request alsjeblieft naar de [`testing`-branch](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
 
-Para probar a rama `testing`, procede deste xeito:
+Om de `testing`-branch uit te proberen, ga als volgt te werk:
 
 ```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
-ou
+of
 sudo yunohost app upgrade monitorix -u https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
 ```
 
-**Máis info sobre o empaquetado da app:** <https://yunohost.org/packaging_apps>
+**Verdere informatie over app-packaging:** <https://yunohost.org/packaging_apps>

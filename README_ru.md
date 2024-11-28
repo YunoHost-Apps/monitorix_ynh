@@ -1,35 +1,35 @@
 <!--
-NOTA: Este README foi creado automáticamente por <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
-NON debe editarse manualmente.
+Важно: этот README был автоматически сгенерирован <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
+Он НЕ ДОЛЖЕН редактироваться вручную.
 -->
 
-# Monitorix para YunoHost
+# Monitorix для YunoHost
 
-[![Nivel de integración](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
-![Estado de funcionamento](https://apps.yunohost.org/badge/state/monitorix)
-![Estado de mantemento](https://apps.yunohost.org/badge/maintained/monitorix)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Состояние работы](https://apps.yunohost.org/badge/state/monitorix)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/monitorix)
 
-[![Instalar Monitorix con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
+[![Установите Monitorix с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
-*[Le este README en outros idiomas.](./ALL_README.md)*
+*[Прочтите этот README на других языках.](./ALL_README.md)*
 
-> *Este paquete permíteche instalar Monitorix de xeito rápido e doado nun servidor YunoHost.*  
-> *Se non usas YunoHost, le a [documentación](https://yunohost.org/install) para saber como instalalo.*
+> *Этот пакет позволяет Вам установить Monitorix быстро и просто на YunoHost-сервер.*  
+> *Если у Вас нет YunoHost, пожалуйста, посмотрите [инструкцию](https://yunohost.org/install), чтобы узнать, как установить его.*
 
-## Vista xeral
+## Обзор
 
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Versión proporcionada:** 3.15.0~ynh3
+**Поставляемая версия:** 3.15.0~ynh3
 
-**Demo:** <https://www.fibranet.cat/monitorix/>
+**Демо-версия:** <https://www.fibranet.cat/monitorix/>
 
-## Capturas de pantalla
+## Снимки экрана
 
-![Captura de pantalla de Monitorix](./doc/screenshots/mail.png)
+![Снимок экрана Monitorix](./doc/screenshots/mail.png)
 
-## Avisos / información importante
+## Дисклеймеры / важная информация
 
 ### Upgrade
 
@@ -281,24 +281,24 @@ In this config we have :
 - We check some process.
 - We send every day, week, month and year a rapport.
 
-## Documentación e recursos
+## Документация и ресурсы
 
-- Web oficial da app: <http://monitorix.org>
-- Documentación oficial para admin: <https://www.monitorix.org/documentation.html>
-- Repositorio de orixe do código: <https://github.com/mikaku/Monitorix>
-- Tenda YunoHost: <https://apps.yunohost.org/app/monitorix>
-- Informar dun problema: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
+- Официальный веб-сайт приложения: <http://monitorix.org>
+- Официальная документация администратора: <https://www.monitorix.org/documentation.html>
+- Репозиторий кода главной ветки приложения: <https://github.com/mikaku/Monitorix>
+- Магазин YunoHost: <https://apps.yunohost.org/app/monitorix>
+- Сообщите об ошибке: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
 
-## Info de desenvolvemento
+## Информация для разработчиков
 
-Envía a túa colaboración á [rama `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
+Пришлите Ваш запрос на слияние в [ветку `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
 
-Para probar a rama `testing`, procede deste xeito:
+Чтобы попробовать ветку `testing`, пожалуйста, сделайте что-то вроде этого:
 
 ```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
-ou
+или
 sudo yunohost app upgrade monitorix -u https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
 ```
 
-**Máis info sobre o empaquetado da app:** <https://yunohost.org/packaging_apps>
+**Больше информации о пакетировании приложений:** <https://yunohost.org/packaging_apps>

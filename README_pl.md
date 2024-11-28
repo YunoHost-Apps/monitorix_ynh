@@ -1,35 +1,35 @@
 <!--
-NOTA: Este README foi creado automáticamente por <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
-NON debe editarse manualmente.
+To README zostało automatycznie wygenerowane przez <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
+Nie powinno być ono edytowane ręcznie.
 -->
 
-# Monitorix para YunoHost
+# Monitorix dla YunoHost
 
-[![Nivel de integración](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
-![Estado de funcionamento](https://apps.yunohost.org/badge/state/monitorix)
-![Estado de mantemento](https://apps.yunohost.org/badge/maintained/monitorix)
+[![Poziom integracji](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Status działania](https://apps.yunohost.org/badge/state/monitorix)
+![Status utrzymania](https://apps.yunohost.org/badge/maintained/monitorix)
 
-[![Instalar Monitorix con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
+[![Zainstaluj Monitorix z YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
-*[Le este README en outros idiomas.](./ALL_README.md)*
+*[Przeczytaj plik README w innym języku.](./ALL_README.md)*
 
-> *Este paquete permíteche instalar Monitorix de xeito rápido e doado nun servidor YunoHost.*  
-> *Se non usas YunoHost, le a [documentación](https://yunohost.org/install) para saber como instalalo.*
+> *Ta aplikacja pozwala na szybką i prostą instalację Monitorix na serwerze YunoHost.*  
+> *Jeżeli nie masz YunoHost zapoznaj się z [poradnikiem](https://yunohost.org/install) instalacji.*
 
-## Vista xeral
+## Przegląd
 
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Versión proporcionada:** 3.15.0~ynh3
+**Dostarczona wersja:** 3.15.0~ynh3
 
 **Demo:** <https://www.fibranet.cat/monitorix/>
 
-## Capturas de pantalla
+## Zrzuty ekranu
 
-![Captura de pantalla de Monitorix](./doc/screenshots/mail.png)
+![Zrzut ekranu z Monitorix](./doc/screenshots/mail.png)
 
-## Avisos / información importante
+## Zastrzeżenia / ważne informacje
 
 ### Upgrade
 
@@ -281,24 +281,24 @@ In this config we have :
 - We check some process.
 - We send every day, week, month and year a rapport.
 
-## Documentación e recursos
+## Dokumentacja i zasoby
 
-- Web oficial da app: <http://monitorix.org>
-- Documentación oficial para admin: <https://www.monitorix.org/documentation.html>
-- Repositorio de orixe do código: <https://github.com/mikaku/Monitorix>
-- Tenda YunoHost: <https://apps.yunohost.org/app/monitorix>
-- Informar dun problema: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
+- Oficjalna strona aplikacji: <http://monitorix.org>
+- Oficjalna dokumentacja dla administratora: <https://www.monitorix.org/documentation.html>
+- Repozytorium z kodem źródłowym: <https://github.com/mikaku/Monitorix>
+- Sklep YunoHost: <https://apps.yunohost.org/app/monitorix>
+- Zgłaszanie błędów: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
 
-## Info de desenvolvemento
+## Informacje od twórców
 
-Envía a túa colaboración á [rama `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
+Wyślij swój pull request do [gałęzi `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
 
-Para probar a rama `testing`, procede deste xeito:
+Aby wypróbować gałąź `testing` postępuj zgodnie z instrukcjami:
 
 ```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
-ou
+lub
 sudo yunohost app upgrade monitorix -u https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
 ```
 
-**Máis info sobre o empaquetado da app:** <https://yunohost.org/packaging_apps>
+**Więcej informacji o tworzeniu paczek aplikacji:** <https://yunohost.org/packaging_apps>

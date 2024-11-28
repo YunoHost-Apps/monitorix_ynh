@@ -1,35 +1,35 @@
 <!--
-NOTA: Este README foi creado automáticamente por <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
-NON debe editarse manualmente.
+N.B.: README ini dibuat secara otomatis oleh <https://github.com/YunoHost/apps/tree/master/tools/readme_generator>
+Ini TIDAK boleh diedit dengan tangan.
 -->
 
-# Monitorix para YunoHost
+# Monitorix untuk YunoHost
 
-[![Nivel de integración](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
-![Estado de funcionamento](https://apps.yunohost.org/badge/state/monitorix)
-![Estado de mantemento](https://apps.yunohost.org/badge/maintained/monitorix)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/monitorix)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+![Status kerja](https://apps.yunohost.org/badge/state/monitorix)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/monitorix)
 
-[![Instalar Monitorix con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
+[![Pasang Monitorix dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
-*[Le este README en outros idiomas.](./ALL_README.md)*
+*[Baca README ini dengan bahasa yang lain.](./ALL_README.md)*
 
-> *Este paquete permíteche instalar Monitorix de xeito rápido e doado nun servidor YunoHost.*  
-> *Se non usas YunoHost, le a [documentación](https://yunohost.org/install) para saber como instalalo.*
+> *Paket ini memperbolehkan Anda untuk memasang Monitorix secara cepat dan mudah pada server YunoHost.*  
+> *Bila Anda tidak mempunyai YunoHost, silakan berkonsultasi dengan [panduan](https://yunohost.org/install) untuk mempelajari bagaimana untuk memasangnya.*
 
-## Vista xeral
+## Ringkasan
 
 Monitorix is a free, open source, lightweight system monitoring tool designed to monitor as many services and system resources as possible. It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Versión proporcionada:** 3.15.0~ynh3
+**Versi terkirim:** 3.15.0~ynh3
 
 **Demo:** <https://www.fibranet.cat/monitorix/>
 
-## Capturas de pantalla
+## Tangkapan Layar
 
-![Captura de pantalla de Monitorix](./doc/screenshots/mail.png)
+![Tangkapan Layar pada Monitorix](./doc/screenshots/mail.png)
 
-## Avisos / información importante
+## Sangkalan / informasi penting
 
 ### Upgrade
 
@@ -281,24 +281,24 @@ In this config we have :
 - We check some process.
 - We send every day, week, month and year a rapport.
 
-## Documentación e recursos
+## Dokumentasi dan sumber daya
 
-- Web oficial da app: <http://monitorix.org>
-- Documentación oficial para admin: <https://www.monitorix.org/documentation.html>
-- Repositorio de orixe do código: <https://github.com/mikaku/Monitorix>
-- Tenda YunoHost: <https://apps.yunohost.org/app/monitorix>
-- Informar dun problema: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
+- Website aplikasi resmi: <http://monitorix.org>
+- Dokumentasi admin resmi: <https://www.monitorix.org/documentation.html>
+- Depot kode aplikasi hulu: <https://github.com/mikaku/Monitorix>
+- Gudang YunoHost: <https://apps.yunohost.org/app/monitorix>
+- Laporkan bug: <https://github.com/YunoHost-Apps/monitorix_ynh/issues>
 
-## Info de desenvolvemento
+## Info developer
 
-Envía a túa colaboración á [rama `testing`](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
+Silakan kirim pull request ke [`testing` branch](https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing).
 
-Para probar a rama `testing`, procede deste xeito:
+Untuk mencoba branch `testing`, silakan dilanjutkan seperti:
 
 ```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
-ou
+atau
 sudo yunohost app upgrade monitorix -u https://github.com/YunoHost-Apps/monitorix_ynh/tree/testing --debug
 ```
 
-**Máis info sobre o empaquetado da app:** <https://yunohost.org/packaging_apps>
+**Info lebih lanjut mengenai pemaketan aplikasi:** <https://yunohost.org/packaging_apps>
