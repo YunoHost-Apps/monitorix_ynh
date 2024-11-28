@@ -23,7 +23,7 @@ Monitorix is a free, open source, lightweight system monitoring tool designed to
 It has been created to be used under production Linux/UNIX servers, but due to its simplicity and small size can be used on embedded devices as well.
 
 
-**Paketatutako bertsioa:** 3.15.0~ynh10
+**Paketatutako bertsioa:** 3.16.0~ynh1
 
 **Demoa:** <https://www.fibranet.cat/monitorix/>
 
