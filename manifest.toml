@@ -7,7 +7,7 @@ name = "Monitorix"
 description.en = "A system monitoring tool"
 description.fr = "Un outil de monitoring système"
 
-version = "3.15.0~ynh10"
+version = "3.16.0~ynh1"
 
 maintainers = ["Josué Tille"]
 
@@ -44,8 +44,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://www.monitorix.org/monitorix_3.15.0-izzy1_all.deb"
-    sha256 = "0d960b9433ecbaba38d9befe27163644886fb5a466d44f5380576ca975b9d8e4"
+    url = "https://www.monitorix.org/monitorix_3.16.0-izzy1_all.deb"
+    sha256 = "cd03086fe104583c6d457d95d7aa28c9bf6ca3dc4dc5a5fa88e19f6536009856"
     rename = "monitorix.deb"
     extract = false
 
