@@ -6,6 +6,6 @@ test_format = 1.0
 
     exclude = []
 
-    test_upgrade_from.9e9d8e3ae23d3c1817d6a8ef6ae4a33370defa82.name = "v3.15.0~ynh3 (manifestv1 - old_version_for_CI_1)"
-    test_upgrade_from.9b82e772d59aa586dd2e0d5c7e9adac09f2d030e.name = "v3.15.0~ynh4 (pre refactoring)"
-    test_upgrade_from.7c45b5268c0ab2dedb92ebb0430e0aad84320d0f.name = "Before helper 2.1"
+    test_upgrade_from.97c374cc07fc5f2eea38f79c0876836d334752aa.name = "v3.15.0~ynh3 (manifestv1 - old_version_for_CI_1)"
+    test_upgrade_from.b05d95387b6606b0f7a23db1060a8a2b89405ac4.name = "v3.15.0~ynh4 (pre refactoring) (old_version_for_CI_2 branch)"
+    test_upgrade_from.810906aa07cb6a4ed4502f1466b781644cc6e1a8.name = "Before helper 2.1 (old_version_for_CI_3 branch)"
