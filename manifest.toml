@@ -65,5 +65,4 @@ ram.runtime = "50M"
     nginx_status.default = 8081
 
     [resources.apt]
-    packages = ["libdbd-pg-perl", "pflogsumm"]
-
+    packages = ["libdbd-pg-perl", "pflogsumm", "libdbd-mysql-perl"]
