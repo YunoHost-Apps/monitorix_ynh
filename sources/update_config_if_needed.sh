@@ -81,7 +81,7 @@ if "$status_dirty"; then
     if "$phpfpm_installed"; then
         config_php_fpm
     fi
-    ynh_systemctl --service="$app" --action=restart --log_path=systemd --wait_until=' - Ok, ready.'
+    ynh_systemctl --service="$app" --action=restart --log_path=systemd --wait_until=' - Ok, ready.' --timeout=120
     ynh_systemctl --service=nginx --action=reload
     save_vars_current_value
 fi

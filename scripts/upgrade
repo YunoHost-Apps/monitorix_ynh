@@ -95,7 +95,7 @@ ynh_config_add_logrotate "/var/log/$app"
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemctl --service="$app" --action=restart --log_path=systemd --wait_until=' - Ok, ready.'
+ynh_systemctl --service="$app" --action=restart --log_path=systemd --wait_until=' - Ok, ready.' --timeout=120
 # when we change the value of 'listen [::1]:xxx;' nginx don't reload correctly the config, so force to restart to ensure that the new config are loaded
 ynh_systemctl --service=nginx.service --action=restart
 save_vars_current_value
