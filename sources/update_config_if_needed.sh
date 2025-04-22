@@ -22,6 +22,8 @@ for var in $var_list_to_manage; do
     fi
 done
 
+# Force update php config for upgrade because we remove all config before the upgrade
+# For remove we really need to be sure that we don't have any leftover to avoid breaking any app restore in case of failed upgrade
 if "$status_dirty" || [ "$YNH_APP_ACTION" == upgrade ] || [ "$YNH_APP_ACTION" == remove ]; then
     config_php_fpm
 fi
