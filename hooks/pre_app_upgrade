@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -eu
+
+YNH_HELPERS_VERSION=2.1
+
+# The file name is <priority>-<app>
+filename="$(basename "$0")"
+app="${filename#*-}"
+
+source /usr/share/yunohost/helpers
+
+# Temporary remove the monitoring of php pools
+for f in '/etc/php/'*"/fpm/pool.d/${app}_status.conf"; do
+    ynh_safe_rm "$f"
+done
