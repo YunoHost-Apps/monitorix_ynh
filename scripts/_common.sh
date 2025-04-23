@@ -139,7 +139,8 @@ EOF
         # Note that 'pm.status_listen' option is only supported on php >= 8.0 so we ignore older pools
         readonly php_pools_infos="$(grep -E '^\[.*\]' \
                 --exclude=/etc/php/*/fpm/pool.d/"$app"_status.conf \
-                --exclude=/etc/php/7.*/fpm/pool.d/* /etc/php/*/fpm/pool.d/* |
+                --exclude=/etc/php/7.*/fpm/pool.d/* \
+                /etc/php/*/fpm/pool.d/* |
             sed -E 's|/etc/php/([[:digit:]]\.[[:digit:]]+)/fpm/pool.d/.+\.conf\:\[(.+)\]|\1,\2|' |
             installed_php_fpm_filter)"
     else

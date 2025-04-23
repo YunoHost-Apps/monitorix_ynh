@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -eu
+
+YNH_HELPERS_VERSION=2.1
+
+# The file name is <priority>-<app>
+filename="$(basename "$0")"
+app="${filename#*-}"
+
+source /usr/share/yunohost/helpers
+
+# Temporary remove the monitoring of php pools
+# this is needed in case of an app upgrade the php version.
+# In this case we need to ensure the the old php version is not any more monitored before the app upgrade process start.
+# otherwise the app upgrade could fail just because monitorix still monitor a pool which was removed.
+for f in '/etc/php/'*"/fpm/pool.d/${app}_status.conf"; do
+    ynh_safe_rm "$f"
+done
