@@ -28,7 +28,7 @@ ynh_config_add --jinja --template=monitorix.conf --destination=/etc/monitorix/mo
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
-ynh_systemctl --service="$app" --action=start --log_path='systemd' --wait_until=' - Ok, ready.'
+ynh_systemctl --service="$app" --action=start --log_path='systemd' --wait_until=' - Ok, ready.' --timeout=120
 
 #=================================================
 # END OF SCRIPT
