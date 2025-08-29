@@ -20,7 +20,7 @@ code = "https://github.com/mikaku/Monitorix"
 cpe = "cpe:2.3:a:fibranet:monitorix"
 
 [integration]
-yunohost = ">= 12.1.15"
+yunohost = ">= 12.1.6"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
