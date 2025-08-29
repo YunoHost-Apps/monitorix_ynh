@@ -84,17 +84,13 @@ load_vars() {
     readonly ssh_port="$((([ -e /etc/yunohost/settings.yml ] && grep ssh_port /etc/yunohost/settings.yml) || echo 22) | cut -d: -f2 | xargs)"
     readonly port_infos="$(python3 <<EOF
 import yaml, socket
-hard_coded_ports = ["25", "53", "80", "443", "587", "993"]
+hard_coded_ports = ["22", "25", "53", "80", "443", "587", "993"]
 with open("/etc/yunohost/firewall.yml", "r") as f:
     firewall = yaml.safe_load(f)
-    tcp4_port_list = [str(port) for port in firewall['ipv4']['TCP']
-                      if str(port) not in hard_coded_ports]
-    tcp6_port_list = [str(port) for port in firewall['ipv6']['TCP']
-                      if str(port) not in hard_coded_ports]
-    udp4_port_list = [str(port) for port in firewall['ipv4']['UDP']
-                      if str(port) not in hard_coded_ports]
-    udp6_port_list = [str(port) for port in firewall['ipv6']['UDP']
-                      if str(port) not in hard_coded_ports]
+    tcp_ports = [str(port) for port, infos in firewall['tcp'].items()
+                      if str(port) not in hard_coded_ports and infos['open']]
+    udp_ports = [str(port) for port, infos in firewall['udp'].items()
+                      if str(port) not in hard_coded_ports and infos['open']]
 with open("/etc/yunohost/services.yml", "r") as f:
     services = yaml.safe_load(f)
     if services is None:
@@ -105,7 +101,7 @@ with open("/etc/yunohost/services.yml", "r") as f:
             for port in value['needs_exposed_ports']:
                 port_map[str(port)] = key
 
-def generate_port_info(proto, ip_version, port):
+def generate_port_info(proto, port):
     if port in port_map:
         name = port_map[port]
     else:
@@ -113,12 +109,10 @@ def generate_port_info(proto, ip_version, port):
             name = socket.getservbyport(int(port), proto)
         except:
             name = "Port_" + port
-    return "%s,%s,%s,%s" % (port, ip_version, proto, name)
+    return "%s,%s,%s" % (port, proto, name)
 
-result = [generate_port_info("tcp", "4", port) for port in tcp4_port_list] + \
-         [generate_port_info("tcp", "6", port) for port in tcp6_port_list] + \
-         [generate_port_info("udp", "4", port) for port in udp4_port_list] + \
-         [generate_port_info("udp", "6", port) for port in udp6_port_list]
+result = [generate_port_info("tcp", port) for port in tcp_ports] + \
+         [generate_port_info("tcp", port) for port in udp_ports]
 result.sort()
 print('\n'.join(result))
 EOF
