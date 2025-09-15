@@ -9,3 +9,26 @@ test_format = 1.0
     test_upgrade_from.97c374cc07fc5f2eea38f79c0876836d334752aa.name = "v3.15.0~ynh3 (manifestv1 - old_version_for_CI_1)"
     test_upgrade_from.b05d95387b6606b0f7a23db1060a8a2b89405ac4.name = "v3.15.0~ynh4 (pre refactoring) (old_version_for_CI_2 branch)"
     test_upgrade_from.810906aa07cb6a4ed4502f1466b781644cc6e1a8.name = "Before helper 2.1 (old_version_for_CI_3 branch)"
+
+
+    # -------------------------------
+    # Curl tests to validate that the app works
+    # -------------------------------
+    [default.curl_tests.root]
+    path = "/"
+    expect_title = "Yunohost Stats"
+    expect_content = '''v(\d+\.)+\d+
+[\n\s]*Hostname
+[\n\s]*Graph
+[\n\s]*localhost
+[\n\s]*All\sgraphs
+[\n\s]*System\sload
+[\n\s]*Memory\sallocation.*'''
+
+    [default.curl_tests.cgi]
+    path = "/cgi/monitorix.cgi?mode=localhost&graph=_system1&when=1day&color=black"
+    expect_content = '''Host:
+[\n\s]*Yunohost\sServer
+[\n\s]*last\sday
+[\n\s]*.*\s20\d{2}
+[\n\s]*System\sload\saverage\sand\susage.*'''

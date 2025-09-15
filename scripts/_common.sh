@@ -157,7 +157,7 @@ install_monitorix_package() {
     ynh_setup_source --dest_dir="$tempdir" --source_id="main"
 
     # Install the package
-    _ynh_apt_install "$tempdir/monitorix.deb"
+    ynh_hide_warnings _ynh_apt_install "$tempdir/monitorix.deb"
     cp -r /var/lib/monitorix/* "$data_dir"/
 }
 
