@@ -14,10 +14,21 @@ test_format = 1.0
     # -------------------------------
     # Curl tests to validate that the app works
     # -------------------------------
-    [default.curl_tests]
-    root.path = "/"
-    root.expect_title = "Yunohost Stats"
-    root.expect_content = "<select name='mode' size='1' id='hostname' onchange='auto_select()'>"
+    [default.curl_tests.root]
+    path = "/"
+    expect_title = "Yunohost Stats"
+    expect_content = '''v(\d+\.)+\d+
+[\n\s]*Hostname
+[\n\s]*Graph
+[\n\s]*localhost
+[\n\s]*All\sgraphs
+[\n\s]*System\sload
+[\n\s]*Memory\sallocation.*'''
 
-    cgi.path = "/cgi/monitorix.cgi"
-    cgi.expect_content = "<table class='cgi-header-table' >"
+    [default.curl_tests.cgi]
+    path = "/cgi/monitorix.cgi?mode=localhost&graph=_system1&when=1day&color=black"
+    expect_content = '''Host:
+[\n\s]*Yunohost\sServer
+[\n\s]*last\sday
+[\n\s]*.*\s20\d{2}
+[\n\s]*System\sload\saverage\sand\susage.*'''
