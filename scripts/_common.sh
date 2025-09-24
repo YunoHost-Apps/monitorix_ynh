@@ -111,8 +111,8 @@ def generate_port_info(proto, port):
             name = "Port_" + port
     return "%s,%s,%s" % (port, proto, name)
 
-result = [generate_port_info("tcp", port) for port in tcp_ports] + \
-         [generate_port_info("tcp", port) for port in udp_ports]
+result = [generate_port_info("tcp", port.replace('-',':')) for port in tcp_ports] + \
+         [generate_port_info("udp", port.replace('-',':')) for port in udp_ports]
 result.sort()
 print('\n'.join(result))
 EOF
