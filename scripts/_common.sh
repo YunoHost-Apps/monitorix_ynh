@@ -209,8 +209,8 @@ configure_alerts_email() {
                       mail.delvd-alert.sh
     do
         alias_path="$install_dir/$alias_file"
-        if [ ! -h "$alias_path" ]; then
-            if [ -e "$alias_path" ]; then
+        if [ ! -h "$alias_path" ] || [ ! -e "$alias_path" ]; then
+            if [ -e "$alias_path" ] || [ -h "$alias_path" ]; then
                 ynh_safe_rm "$alias_path"
             fi
             ln -s "$install_dir/monitorix-alert.sh" "$install_dir/$alias_file"
