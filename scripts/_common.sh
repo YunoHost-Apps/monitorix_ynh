@@ -111,8 +111,8 @@ def generate_port_info(proto, port):
             name = "Port_" + port
     return "%s,%s,%s" % (port, proto, name)
 
-result = [generate_port_info("tcp", port) for port in tcp_ports] + \
-         [generate_port_info("tcp", port) for port in udp_ports]
+result = [generate_port_info("tcp", port.replace('-',':')) for port in tcp_ports] + \
+         [generate_port_info("udp", port.replace('-',':')) for port in udp_ports]
 result.sort()
 print('\n'.join(result))
 EOF
@@ -209,8 +209,8 @@ configure_alerts_email() {
                       mail.delvd-alert.sh
     do
         alias_path="$install_dir/$alias_file"
-        if [ ! -h "$alias_path" ]; then
-            if [ -e "$alias_path" ]; then
+        if [ ! -h "$alias_path" ] || [ ! -e "$alias_path" ]; then
+            if [ -e "$alias_path" ] || [ -h "$alias_path" ]; then
                 ynh_safe_rm "$alias_path"
             fi
             ln -s "$install_dir/monitorix-alert.sh" "$install_dir/$alias_file"
@@ -232,6 +232,7 @@ ensure_vars_set() {
     ynh_app_setting_set_default --key=disk_alerts_loadavg_enabled --value=false
     ynh_app_setting_set_default --key=disk_alerts_loadavg_timeintvl --value=3600
     ynh_app_setting_set_default --key=disk_alerts_loadavg_threshold --value=98
+    ynh_app_setting_set_default --key=du_refresh_interval --value=3600 # every hours
     ynh_app_setting_set_default --key=mail_delvd_enabled --value=n
     ynh_app_setting_set_default --key=mail_delvd_timeintvl --value=60
     ynh_app_setting_set_default --key=mail_delvd_threshold --value=100

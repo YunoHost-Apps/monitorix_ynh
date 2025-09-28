@@ -52,6 +52,8 @@ if "$status_dirty"; then
     disk_alerts_loadavg_timeintvl="$(ynh_app_setting_get --key=disk_alerts_loadavg_timeintvl)"
     disk_alerts_loadavg_threshold="$(ynh_app_setting_get --key=disk_alerts_loadavg_threshold)"
 
+    du_refresh_interval="$(ynh_app_setting_get --key=du_refresh_interval)"
+
     mail_delvd_enabled="$(ynh_app_setting_get --key=mail_delvd_enabled)"
     mail_delvd_timeintvl="$(ynh_app_setting_get --key=mail_delvd_timeintvl)"
     mail_delvd_threshold="$(ynh_app_setting_get --key=mail_delvd_threshold)"

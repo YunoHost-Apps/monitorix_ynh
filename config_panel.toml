@@ -95,6 +95,17 @@ name.en = "Monitorix configuration"
         type = "number"
         help = "Percentage to reach to send alert."
 
+    [config.du]
+    name = "Directory usage"
+
+        [config.du.du_refresh_interval]
+        ask.en = "Refresh interval in seconds"
+        type = "number"
+        min = 60
+        max = 86400
+        default = 3600
+        help = "This is an option to reduce the execution of the du command and undesired side effects caused by this. Default value 0 means normal refresh with all other plots. Values are from 60 to 86400. Keep in mind that changing the refresh_interval is possible without loosing history but changing the interval to a smaller one will introduce gaps in the data at the transition point."
+
     [config.mail]
     name = "Mail statistics"
 
