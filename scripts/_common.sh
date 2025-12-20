@@ -192,10 +192,11 @@ config_php_fpm() {
 }
 
 configure_hooks() {
-    ynh_replace --match=__APP__ --replace="$app" --file=../hooks/post_iptable_rules
     ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_install
     ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_remove
+    ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_restore
     ynh_replace --match=__INSTALL_DIR__ --replace="$install_dir" --file=../hooks/post_app_upgrade
+    ynh_replace --match=__APP__ --replace="$app" --file=../hooks/post_iptable_rules
 
     cp ../sources/update_config_if_needed.sh "$install_dir"/
     ynh_replace --match=__APP__ --replace="$app" --file="$install_dir"/update_config_if_needed.sh
